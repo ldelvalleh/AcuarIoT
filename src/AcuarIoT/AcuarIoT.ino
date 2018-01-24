@@ -47,6 +47,7 @@ WiFiUDP ntpUDP;
 // Por defecto utiliza el servidor 'time.nist.gov' y actualiza cada 60 segundos
 NTPClient timeClient(ntpUDP);
 unsigned long tiempoActual;
+int tiempoActualizacion = 60000;
 
 /*
    Definición: enviarDatosFirebase
@@ -216,38 +217,45 @@ void setup() {
 
   // Iniciamos el NTPClient
   timeClient.begin();
+
+  // Establecemos tiempo
+  tiempoActual = millis();
 }
 
 void loop() {
-  // Obtenemos la temperatura
-  float temperaturaDHT11 = obtenerTempDHT11();
-  // Obtenemos la humedad
-  float humedadDHT11 = obtenerHumDHT11();
-  // Obtenemos el índice de calor
-  float indiceCalorDHT11 = obtenerIndiceDHT11(temperaturaDHT11, humedadDHT11);
+  // Sólo si ha pasado el tiempo actualizamos
+  if (millis() - tiempoActual >= tiempoActualizacion)
+  {
+    // Establecemos tiempo
+    tiempoActual = millis();
+
+    // Obtenemos la temperatura
+    float temperaturaDHT11 = obtenerTempDHT11();
+    // Obtenemos la humedad
+    float humedadDHT11 = obtenerHumDHT11();
+    // Obtenemos el índice de calor
+    float indiceCalorDHT11 = obtenerIndiceDHT11(temperaturaDHT11, humedadDHT11);
 
 #ifdef ACUARIO_DEBUG
-  Serial.println("******* DHT11 *******");
-  Serial.print("Humedad: ");
-  Serial.print(humedadDHT11);
-  Serial.print(" %\t");
-  Serial.print("Temperatura: ");
-  Serial.print(temperaturaDHT11);
-  Serial.print(" *C\t");
-  Serial.print("Índice de calor: ");
-  Serial.print(indiceCalorDHT11);
-  Serial.println(" *C ");
+    Serial.println("******* DHT11 *******");
+    Serial.print("Humedad: ");
+    Serial.print(humedadDHT11);
+    Serial.print(" %\t");
+    Serial.print("Temperatura: ");
+    Serial.print(temperaturaDHT11);
+    Serial.print(" *C\t");
+    Serial.print("Índice de calor: ");
+    Serial.print(indiceCalorDHT11);
+    Serial.println(" *C ");
 #endif
 
-  // Enviamos los datos a Firebase
-  while (!enviarDatosFirebase(temperaturaDHT11, humedadDHT11, indiceCalorDHT11)) {
+    // Enviamos los datos a Firebase
+    while (!enviarDatosFirebase(temperaturaDHT11, humedadDHT11, indiceCalorDHT11)) {
 #ifdef ACUARIO_DEBUG
-    Serial.println("Esperando 10 segundos");
+      Serial.println("Esperando 10 segundos");
 #endif
-    // Esperamos 10 segundos
-    delay(10000);
+      // Esperamos 10 segundos
+      delay(10000);
+    }
   }
-
-  // Esperamos 5 segundos entre medidas
-  delay(15000);
 }
