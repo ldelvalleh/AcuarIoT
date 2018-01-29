@@ -41,9 +41,9 @@ int tiempoActualizacion = 10000;
    Configuración MQTT
 */
 PubSubClient mqttCliente(clienteEsp);
-const char* mqttServidor="192.168.0.155";
+const char* mqttServidor = "192.168.0.155";
 const int mqttPuerto = 1883;
-const char mqttTopicAcciones[]="casa/acuario/acciones";
+const char mqttTopicAcciones[] = "casa/acuario/acciones";
 const char mqttTopicTemperaturaExt[] = "casa/servidor/tempext";
 const char mqttTopicHumedadExt[] = "casa/servidor/humext";
 const char mqttTopicTemperaturaAgua[] = "casa/servidor/tempagua";
@@ -126,8 +126,8 @@ float obtenerIndiceDHT11(float temperatura, float humedad) {
    unsigned int longitud  Longitud del mensaje recibido
 
    Return: void           No devuelve nada
- */
-void mqttCallback (char* topic, byte* mensaje, unsigned int longitud){
+*/
+void mqttCallback (char* topic, byte* mensaje, unsigned int longitud) {
 #ifdef ACUARIO_DEBUG
   Serial.print("[MQTT] Mensaje recibido [");
   Serial.print(topic);
@@ -147,8 +147,8 @@ void mqttCallback (char* topic, byte* mensaje, unsigned int longitud){
    Parámetros:
 
    Return: void           No devuelve nada
- */
-void mqttReconectar(){
+*/
+void mqttReconectar() {
   // Repetimos hasta que se conecte
   while (!mqttCliente.connected()) {
 #ifdef ACUARIO_DEBUG
@@ -182,18 +182,18 @@ void mqttReconectar(){
    float tmperatura       Temperatura exterior
 
    Return: void           No devuelve nada
- */
-void mqttPublicarTemperatura(float temperatura){
+*/
+void mqttPublicarTemperatura(float temperatura) {
   char msg[32];
   snprintf(msg, 32, "%f", temperatura);
   // Envío del mensaje al topic
   mqttCliente.publish(mqttTopicTemperaturaExt, msg);
 #ifdef ACUARIO_DEBUG
-      Serial.print("[MQTT] Publicando mensaje ");
-      Serial.print(msg);
-      Serial.print(" en el topic [");
-      Serial.print(mqttTopicTemperaturaExt);
-      Serial.println("]");
+  Serial.print("[MQTT] Publicando mensaje ");
+  Serial.print(msg);
+  Serial.print(" en el topic [");
+  Serial.print(mqttTopicTemperaturaExt);
+  Serial.println("]");
 #endif
 }
 
@@ -219,15 +219,15 @@ void setup() {
 }
 
 void loop() {
-      // Conexión con MQTT
-    if(!mqttCliente.connected()){
-      // Volvemos a conectar
-      mqttReconectar();
-    }
+  // Conexión con MQTT
+  if (!mqttCliente.connected()) {
+    // Volvemos a conectar
+    mqttReconectar();
+  }
 
-    // Procesamos los mensajes entrantes
-    mqttCliente.loop();
-  
+  // Procesamos los mensajes entrantes
+  mqttCliente.loop();
+
   // Sólo si ha pasado el tiempo actualizamos
   if (millis() - tiempoActual >= tiempoActualizacion ||
       tiempoActual == 0)
@@ -255,8 +255,10 @@ void loop() {
 #endif
 
     // Envío de datos al broker MQTT
-    // Temperatura
-    mqttPublicarTemperatura(temperaturaDHT11);
+    if (temperaturaDHT11 != -100.0) {
+      // Temperatura
+      mqttPublicarTemperatura(temperaturaDHT11);
+    }
   }
 }
 
