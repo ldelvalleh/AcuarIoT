@@ -49,6 +49,7 @@ const int mqttPuerto = 1883;
 const char mqttTopicAcciones[] = "casa/acuario/acciones";
 const char mqttTopicTemperaturaExt[] = "casa/servidor/tempext";
 const char mqttTopicHumedadExt[] = "casa/servidor/humext";
+const char mqttTopicIndiceExt[] = "casa/servidor/indiceext";
 const char mqttTopicTemperaturaAgua[] = "casa/servidor/tempagua";
 const char mqttTopicPhAgua[] = "casa/servidor/phagua";
 
@@ -73,9 +74,9 @@ boolean obtenerTempDHT11() {
   float temperatura = dht.readTemperature();
 
 #ifdef ACUARIO_DEBUG
-    Serial.print("[DHT11] Temperatura: ");
-    Serial.print(temperatura);
-    Serial.println(" ºC");
+  Serial.print("[DHT11] Temperatura: ");
+  Serial.print(temperatura);
+  Serial.println(" ºC");
 #endif
 
   // Comprobamos si ha habido algún error en la lectura
@@ -106,9 +107,9 @@ float obtenerHumDHT11() {
   float humedad = dht.readHumidity();
 
 #ifdef ACUARIO_DEBUG
-    Serial.print("[DHT11] Humedad: ");
-    Serial.print(humedad);
-    Serial.println(" %");
+  Serial.print("[DHT11] Humedad: ");
+  Serial.print(humedad);
+  Serial.println(" %");
 #endif
 
   // Comprobamos si ha habido algún error en la lectura
@@ -247,6 +248,30 @@ void mqttPublicarHumedadExt() {
 #endif
 }
 
+/*
+   Definición:  mqttPublicarIndiceExt
+
+   Propósito:   publica el índice de calor exterior en el broker MQTT
+
+   Parámetros:
+
+   Return: void           No devuelve nada
+*/
+void mqttPublicarIndiceExt(float indiceCalor) {
+  char msg[32];
+  snprintf(msg, 32, "%2.1f", indiceCalor);
+  // Envío del mensaje al topic
+  mqttCliente.publish(mqttTopicIndiceExt, msg);
+#ifdef ACUARIO_DEBUG
+  Serial.print("[MQTT] Publicando mensaje ");
+  Serial.print(msg);
+  Serial.print(" en el topic [");
+  Serial.print(mqttTopicHumedadExt);
+  Serial.println("]");
+#endif
+}
+
+
 void setup() {
   // Inicializamos comunicación serie
   Serial.begin(115200);
@@ -290,7 +315,7 @@ void loop() {
     tiempoActual = millis();
 
     // Comprobación publicación MQTT
-    boolean mqttPublicar=true;
+    boolean mqttPublicar = true;
 
     // Obtenemos la temperatura
     mqttPublicar = mqttPublicar && obtenerTempDHT11();
@@ -309,6 +334,8 @@ void loop() {
       mqttPublicarTemperatura();
       // Humedad
       mqttPublicarHumedadExt();
+      // Indice Calor
+      mqttPublicarIndiceExt(indiceCalorDHT11);
     }
   }
 }
