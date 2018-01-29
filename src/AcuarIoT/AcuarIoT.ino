@@ -1,18 +1,13 @@
 // Librerías WiFiManager
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
-#include <ESP8266WebServer.h>
 #include <WiFiManager.h>
 
 // Librería DHT
 #include <DHT.h>
 
-// Librería Json
-#include <ArduinoJson.h>
-
-// NTP Network Time Protocol (sincronización fecha y hora)
-#include <NTPClient.h>
-#include <WiFiUdp.h>
+// MQTT
+#include <PubSubClient.h>
 
 /*
    Debug
@@ -34,107 +29,25 @@ DHT dht(DHTPIN, DHTTYPE);
    Configuración cliente Firebase
 */
 // Cliente WiFi
-WiFiClientSecure cliente;
-// Host o url de Firebase
-#define HOSTFIREBASE "acuario-arduino.firebaseio.com"
-
-const byte tamanoBufferJson = 200;
+WiFiClient clienteEsp;
 
 /*
-   Configuración NTPclient
+   Configuración tiempos
 */
-WiFiUDP ntpUDP;
-// Por defecto utiliza el servidor 'time.nist.gov' y actualiza cada 60 segundos
-NTPClient timeClient(ntpUDP);
 unsigned long tiempoActual;
-int tiempoActualizacion = 60000;
+int tiempoActualizacion = 10000;
 
 /*
-   Definición: enviarDatosFirebase
-
-   Propósito: envía los datos a Firebase
-
-   Parámetros:
-   float temperaturaDHT11 Temperatura en grados Celsius del DHT11
-   float humedadDHT11     Humedad en tanto por ciento del DHT11
-   float indiceCarloDHT11 Indice de calor grados Celsius del DHT11
-
-   Return: boolean        Si ha conseguido enviar los datos
+   Configuración MQTT
 */
-boolean enviarDatosFirebase(float temperaturaDHT11, float humedadDHT11, float indiceCarloDHT11) {
-  // Reservamos los bytes del JSON
-  StaticJsonBuffer<tamanoBufferJson> jsonBuffer;
-
-  // Creamos un objeto JSON
-  JsonObject& mensajeJson = jsonBuffer.createObject();
-
-  // Agregamos valores al JSON
-  mensajeJson["temperaturaext"] = temperaturaDHT11;
-  mensajeJson["humedadext"] = humedadDHT11;
-  mensajeJson["indicecalorext"] = indiceCarloDHT11;
-
-  // Lo convertimos en una cadena de texto
-  String mensajeHttpJson = "";
-  mensajeJson.prettyPrintTo(mensajeHttpJson);
-  mensajeHttpJson += "\r\n";
-
-  // Obtenemos la fecha timestamp
-  timeClient.update();
-  unsigned long fechaTimestamp = timeClient.getEpochTime();
-
-  // Cerramos cualquier conexión antes de enviar una nueva petición
-  cliente.stop();
-  cliente.flush();
-
-  // Enviamos una petición por SSL
-  if (cliente.connect(HOSTFIREBASE, 443)) {
-    // Petición PUT JSON
-    cliente.print("PUT /");
-    cliente.print(fechaTimestamp);
-    cliente.println(".json HTTP/1.1");
-    cliente.print("Host:");
-    cliente.println(HOSTFIREBASE);
-    cliente.println("Content-Type: application/json");
-    cliente.println("Content-Length: " + String(mensajeHttpJson.length()));
-    cliente.println("");
-    cliente.println(mensajeHttpJson);
-#ifdef ACUARIO_DEBUG
-    Serial.println("******* HTTP REQUEST FIREBASE *******");
-    Serial.print("PUT /");
-    Serial.print(fechaTimestamp);
-    Serial.println(".json HTTP/1.1");
-    Serial.print("Host: ");
-    Serial.println(HOSTFIREBASE);
-    Serial.println("Content-Type: application/json");
-    Serial.println("Cache-Control: no-cache");
-    Serial.println("Content-Length: " + String(mensajeHttpJson.length()));
-    Serial.println("");
-    Serial.println(mensajeHttpJson);
-
-    // Leemos respuesta del servidor
-    Serial.println("******* HTTP RESPONSE FIREBASE *******");
-    while (cliente.connected()) {
-      String line = cliente.readStringUntil('\n');
-      Serial.println(line);
-      if (line == "\r") {
-        break;
-      }
-    }
-#endif
-    cliente.flush();
-    cliente.stop();
-  } else {
-    // Si no podemos conectar
-    cliente.flush();
-    cliente.stop();
-#ifdef ACUARIO_DEBUG
-    Serial.println("Error llamada a Firebase");
-#endif
-    return false;
-  }
-
-  return true;
-}
+PubSubClient mqttCliente(clienteEsp);
+const char* mqttServidor="192.168.0.155";
+const int mqttPuerto = 1883;
+const char mqttTopicAcciones[]="casa/acuario/acciones";
+const char mqttTopicTemperaturaExt[] = "casa/servidor/tempext";
+const char mqttTopicHumedadExt[] = "casa/servidor/humext";
+const char mqttTopicTemperaturaAgua[] = "casa/servidor/tempagua";
+const char mqttTopicPhAgua[] = "casa/servidor/phagua";
 
 /*
    Definición: obtenerTempDHT11
@@ -152,7 +65,7 @@ float obtenerTempDHT11() {
   // Comprobamos si ha habido algún error en la lectura
   if (isnan(temperatura)) {
 #ifdef ACUARIO_DEBUG
-    Serial.println("Error obteniendo la temperatura del sensor DHT11");
+    Serial.println("[DHT11] Error obteniendo la temperatura del sensor DHT11");
 #endif
     return -100;
   }
@@ -176,7 +89,7 @@ float obtenerHumDHT11() {
   // Comprobamos si ha habido algún error en la lectura
   if (isnan(humedad)) {
 #ifdef ACUARIO_DEBUG
-    Serial.println("Error obteniendo la humedad del sensor DHT11");
+    Serial.println("[DHT11] Error obteniendo la humedad del sensor DHT11");
 #endif
     return -100;
   }
@@ -202,9 +115,91 @@ float obtenerIndiceDHT11(float temperatura, float humedad) {
   return indiceCalor;
 }
 
+/*
+   Definición: mqttCallback
+
+   Propósito: esta función se ejecuta cada vez que recibe un mensaje MQTT
+
+   Parámetros:
+   char* topic            Topic por el que se ha recibido el mensaje
+   byte* mensaje          Mensaje recibido
+   unsigned int longitud  Longitud del mensaje recibido
+
+   Return: void           No devuelve nada
+ */
+void mqttCallback (char* topic, byte* mensaje, unsigned int longitud){
+#ifdef ACUARIO_DEBUG
+  Serial.print("[MQTT] Mensaje recibido [");
+  Serial.print(topic);
+  Serial.print("]: ");
+  for (int i = 0; i < longitud; i++) {
+    Serial.print((char)mensaje[i]);
+  }
+  Serial.println();
+#endif
+}
+
+/*
+   Definición:  mqttReconectar
+
+   Propósito:   volver a conectar con el broker MQTT
+
+   Parámetros:
+
+   Return: void           No devuelve nada
+ */
+void mqttReconectar(){
+  // Repetimos hasta que se conecte
+  while (!mqttCliente.connected()) {
+#ifdef ACUARIO_DEBUG
+    Serial.println("[MQTT] Esperando conexión con el broker MQTT...");
+#endif
+    // Intentando conectar
+    if (mqttCliente.connect("ACUARIO")) {
+#ifdef ACUARIO_DEBUG
+      Serial.println("[MQTT] Conectado al broker MQTT");
+      // Subscripción al topic de acciones
+      mqttCliente.subscribe(mqttTopicAcciones);
+#endif
+    } else {
+#ifdef ACUARIO_DEBUG
+      Serial.print("[MQTT] Fallo al conectar MQTT, rc=");
+      Serial.print(mqttCliente.state());
+      Serial.println(" probando de nuevo en 5 segundos");
+#endif
+      // Esperamos 5 segundos para volver a conectar
+      delay(5000);
+    }
+  }
+}
+
+/*
+   Definición:  mqttPublicarTemperaturaExt
+
+   Propósito:   publica la temperatura exterior en el broker MQTT
+
+   Parámetros:
+   float tmperatura       Temperatura exterior
+
+   Return: void           No devuelve nada
+ */
+void mqttPublicarTemperatura(float temperatura){
+  char msg[32];
+  snprintf(msg, 32, "%f", temperatura);
+  // Envío del mensaje al topic
+  mqttCliente.publish(mqttTopicTemperaturaExt, msg);
+#ifdef ACUARIO_DEBUG
+      Serial.print("[MQTT] Publicando mensaje ");
+      Serial.print(msg);
+      Serial.print(" en el topic [");
+      Serial.print(mqttTopicTemperaturaExt);
+      Serial.println("]");
+#endif
+}
+
 void setup() {
   // Inicializamos comunicación serie
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   // Comenzamos el sensor DHT
   dht.begin();
@@ -215,16 +210,27 @@ void setup() {
   // Configuramos el punto de acceso. Puedes poner el nombre que quieras
   wifiManager.autoConnect("ACUARIO-WIFI");
 
-  // Iniciamos el NTPClient
-  timeClient.begin();
-
   // Establecemos tiempo
-  tiempoActual = millis();
+  tiempoActual = 0;
+
+  // Configuración broker MQTT
+  mqttCliente.setServer(mqttServidor, mqttPuerto);
+  mqttCliente.setCallback(mqttCallback);
 }
 
 void loop() {
+      // Conexión con MQTT
+    if(!mqttCliente.connected()){
+      // Volvemos a conectar
+      mqttReconectar();
+    }
+
+    // Procesamos los mensajes entrantes
+    mqttCliente.loop();
+  
   // Sólo si ha pasado el tiempo actualizamos
-  if (millis() - tiempoActual >= tiempoActualizacion)
+  if (millis() - tiempoActual >= tiempoActualizacion ||
+      tiempoActual == 0)
   {
     // Establecemos tiempo
     tiempoActual = millis();
@@ -237,8 +243,7 @@ void loop() {
     float indiceCalorDHT11 = obtenerIndiceDHT11(temperaturaDHT11, humedadDHT11);
 
 #ifdef ACUARIO_DEBUG
-    Serial.println("******* DHT11 *******");
-    Serial.print("Humedad: ");
+    Serial.print("[DHT11] Humedad: ");
     Serial.print(humedadDHT11);
     Serial.print(" %\t");
     Serial.print("Temperatura: ");
@@ -249,13 +254,9 @@ void loop() {
     Serial.println(" *C ");
 #endif
 
-    // Enviamos los datos a Firebase
-    while (!enviarDatosFirebase(temperaturaDHT11, humedadDHT11, indiceCalorDHT11)) {
-#ifdef ACUARIO_DEBUG
-      Serial.println("Esperando 10 segundos");
-#endif
-      // Esperamos 10 segundos
-      delay(10000);
-    }
+    // Envío de datos al broker MQTT
+    // Temperatura
+    mqttPublicarTemperatura(temperaturaDHT11);
   }
 }
+
