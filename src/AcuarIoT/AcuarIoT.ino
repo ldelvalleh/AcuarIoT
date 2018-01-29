@@ -12,6 +12,9 @@
 // Media
 #include "RunningAverage.h"
 
+// DS18B20
+#include <DallasTemperature.h>
+
 /*
    Debug
 */
@@ -59,6 +62,16 @@ const char mqttTopicPhAgua[] = "casa/servidor/phagua";
 
 RunningAverage mediaTemperatura(50);
 RunningAverage mediaHumedad(50);
+RunningAverage mediaTemperaturaAgua(50);
+
+/*
+   Cálculo temperatura agua
+*/
+// Pin donde se conecta el bus 1-Wire
+const int ds18b20Pin = D6;
+// Instancia a las clases OneWire y DallasTemperature
+OneWire ds18b20OneWireObjeto(ds18b20Pin);
+DallasTemperature ds18b20Sensor(&ds18b20OneWireObjeto);
 
 /*
    Definición: obtenerTempDHT11
@@ -142,6 +155,33 @@ float obtenerIndiceDHT11() {
   float indiceCalor = dht.computeHeatIndex(mediaTemperatura.getAverage(), mediaHumedad.getAverage(), false);
 
   return indiceCalor;
+}
+
+/*
+   Definición: obtenerTempDHT11
+
+   Propósito: obtener la temperatura en grados Celsius
+
+   Parámetros: ninguno
+
+   Return: void        No devuelve ningún valor
+*/
+boolean obtenerTempDs18b20() {
+
+  // Obtención de temperatura DS18B20
+  ds18b20Sensor.requestTemperatures();
+  float temperatura = ds18b20Sensor.getTempCByIndex(0);
+
+#ifdef ACUARIO_DEBUG
+  Serial.print("[DS18B20] Temperatura: ");
+  Serial.print(temperatura);
+  Serial.println(" ºC");
+#endif
+
+  // Calculo de la media
+  mediaTemperaturaAgua.addValue(temperatura);
+
+  return true;
 }
 
 /*
@@ -254,8 +294,9 @@ void mqttPublicarHumedadExt() {
    Propósito:   publica el índice de calor exterior en el broker MQTT
 
    Parámetros:
+   float        Indice de calor en grados Celsius
 
-   Return: void           No devuelve nada
+   Return: void No devuelve nada
 */
 void mqttPublicarIndiceExt(float indiceCalor) {
   char msg[32];
@@ -266,11 +307,33 @@ void mqttPublicarIndiceExt(float indiceCalor) {
   Serial.print("[MQTT] Publicando mensaje ");
   Serial.print(msg);
   Serial.print(" en el topic [");
-  Serial.print(mqttTopicHumedadExt);
+  Serial.print(mqttTopicIndiceExt);
   Serial.println("]");
 #endif
 }
 
+/*
+   Definición:  mqttPublicarTemperaturaAgua
+
+   Propósito:   publica el índice de calor exterior en el broker MQTT
+
+   Parámetros:
+
+   Return: void No devuelve nada
+*/
+void mqttPublicarTemperaturaAgua() {
+  char msg[32];
+  snprintf(msg, 32, "%2.1f", mediaTemperaturaAgua.getAverage());
+  // Envío del mensaje al topic
+  mqttCliente.publish(mqttTopicTemperaturaAgua, msg);
+#ifdef ACUARIO_DEBUG
+  Serial.print("[MQTT] Publicando mensaje ");
+  Serial.print(msg);
+  Serial.print(" en el topic [");
+  Serial.print(mqttTopicTemperaturaAgua);
+  Serial.println("]");
+#endif
+}
 
 void setup() {
   // Inicializamos comunicación serie
@@ -295,6 +358,9 @@ void setup() {
   // Limpiamos las medias
   mediaTemperatura.clear();
   mediaHumedad.clear();
+
+  // Iniciamos el bus 1-Wire
+  ds18b20Sensor.begin();
 }
 
 void loop() {
@@ -328,14 +394,19 @@ void loop() {
       indiceCalorDHT11 = obtenerIndiceDHT11();
     }
 
+    // Obtenemos temperatura agua
+    obtenerTempDs18b20();
+
     // Envío de datos al broker MQTT
     if (mqttPublicar) {
-      // Temperatura
+      // Temperatura ambiente
       mqttPublicarTemperatura();
-      // Humedad
+      // Humedad ambiente
       mqttPublicarHumedadExt();
       // Indice Calor
       mqttPublicarIndiceExt(indiceCalorDHT11);
+      // Publicar temperatura agua
+      mqttPublicarTemperaturaAgua();
     }
   }
 }
