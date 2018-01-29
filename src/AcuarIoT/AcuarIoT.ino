@@ -9,6 +9,9 @@
 // MQTT
 #include <PubSubClient.h>
 
+// Media
+#include "RunningAverage.h"
+
 /*
    Debug
 */
@@ -35,7 +38,7 @@ WiFiClient clienteEsp;
    Configuración tiempos
 */
 unsigned long tiempoActual;
-int tiempoActualizacion = 10000;
+int tiempoActualizacion = 15000;
 
 /*
    Configuración MQTT
@@ -50,27 +53,43 @@ const char mqttTopicTemperaturaAgua[] = "casa/servidor/tempagua";
 const char mqttTopicPhAgua[] = "casa/servidor/phagua";
 
 /*
+   Calculo de la media
+*/
+
+RunningAverage mediaTemperatura(50);
+RunningAverage mediaHumedad(50);
+
+/*
    Definición: obtenerTempDHT11
 
    Propósito: obtener la temperatura en grados Celsius
 
    Parámetros: ninguno
 
-   Return: float        Temperatura en grados Celsius
+   Return: boolean        Devuelve si ha habido algún error
 */
-float obtenerTempDHT11() {
+boolean obtenerTempDHT11() {
   // Leemos la temperatura en grados centígrados (por defecto)
   float temperatura = dht.readTemperature();
+
+#ifdef ACUARIO_DEBUG
+    Serial.print("[DHT11] Temperatura: ");
+    Serial.print(temperatura);
+    Serial.println(" ºC");
+#endif
 
   // Comprobamos si ha habido algún error en la lectura
   if (isnan(temperatura)) {
 #ifdef ACUARIO_DEBUG
     Serial.println("[DHT11] Error obteniendo la temperatura del sensor DHT11");
 #endif
-    return -100;
+    return false;
   }
 
-  return temperatura;
+  // Calculo de la media
+  mediaTemperatura.addValue(temperatura);
+
+  return true;
 }
 
 /*
@@ -80,11 +99,17 @@ float obtenerTempDHT11() {
 
    Parámetros: ninguno
 
-   Return: float        Humedad en tanto por ciento
+   Return: boolean        Devuelve si ha habido algún error
 */
 float obtenerHumDHT11() {
   // Leemos la humedad relativa
   float humedad = dht.readHumidity();
+
+#ifdef ACUARIO_DEBUG
+    Serial.print("[DHT11] Humedad: ");
+    Serial.print(humedad);
+    Serial.println(" %");
+#endif
 
   // Comprobamos si ha habido algún error en la lectura
   if (isnan(humedad)) {
@@ -93,6 +118,9 @@ float obtenerHumDHT11() {
 #endif
     return -100;
   }
+
+  // Calculo de la media
+  mediaHumedad.addValue(humedad);
 
   return humedad;
 }
@@ -108,9 +136,9 @@ float obtenerHumDHT11() {
 
    Return: float        Indice de calor
 */
-float obtenerIndiceDHT11(float temperatura, float humedad) {
+float obtenerIndiceDHT11() {
   // Calcular el índice de calor en grados centígrados
-  float indiceCalor = dht.computeHeatIndex(temperatura, humedad, false);
+  float indiceCalor = dht.computeHeatIndex(mediaTemperatura.getAverage(), mediaHumedad.getAverage(), false);
 
   return indiceCalor;
 }
@@ -179,13 +207,12 @@ void mqttReconectar() {
    Propósito:   publica la temperatura exterior en el broker MQTT
 
    Parámetros:
-   float tmperatura       Temperatura exterior
 
    Return: void           No devuelve nada
 */
-void mqttPublicarTemperatura(float temperatura) {
+void mqttPublicarTemperatura() {
   char msg[32];
-  snprintf(msg, 32, "%f", temperatura);
+  snprintf(msg, 32, "%2.1f", mediaTemperatura.getAverage());
   // Envío del mensaje al topic
   mqttCliente.publish(mqttTopicTemperaturaExt, msg);
 #ifdef ACUARIO_DEBUG
@@ -193,6 +220,29 @@ void mqttPublicarTemperatura(float temperatura) {
   Serial.print(msg);
   Serial.print(" en el topic [");
   Serial.print(mqttTopicTemperaturaExt);
+  Serial.println("]");
+#endif
+}
+
+/*
+   Definición:  mqttPublicarHumedadExt
+
+   Propósito:   publica la humedad exterior en el broker MQTT
+
+   Parámetros:
+
+   Return: void           No devuelve nada
+*/
+void mqttPublicarHumedadExt() {
+  char msg[32];
+  snprintf(msg, 32, "%2.1f", mediaHumedad.getAverage());
+  // Envío del mensaje al topic
+  mqttCliente.publish(mqttTopicHumedadExt, msg);
+#ifdef ACUARIO_DEBUG
+  Serial.print("[MQTT] Publicando mensaje ");
+  Serial.print(msg);
+  Serial.print(" en el topic [");
+  Serial.print(mqttTopicHumedadExt);
   Serial.println("]");
 #endif
 }
@@ -216,6 +266,10 @@ void setup() {
   // Configuración broker MQTT
   mqttCliente.setServer(mqttServidor, mqttPuerto);
   mqttCliente.setCallback(mqttCallback);
+
+  // Limpiamos las medias
+  mediaTemperatura.clear();
+  mediaHumedad.clear();
 }
 
 void loop() {
@@ -235,29 +289,26 @@ void loop() {
     // Establecemos tiempo
     tiempoActual = millis();
 
-    // Obtenemos la temperatura
-    float temperaturaDHT11 = obtenerTempDHT11();
-    // Obtenemos la humedad
-    float humedadDHT11 = obtenerHumDHT11();
-    // Obtenemos el índice de calor
-    float indiceCalorDHT11 = obtenerIndiceDHT11(temperaturaDHT11, humedadDHT11);
+    // Comprobación publicación MQTT
+    boolean mqttPublicar=true;
 
-#ifdef ACUARIO_DEBUG
-    Serial.print("[DHT11] Humedad: ");
-    Serial.print(humedadDHT11);
-    Serial.print(" %\t");
-    Serial.print("Temperatura: ");
-    Serial.print(temperaturaDHT11);
-    Serial.print(" *C\t");
-    Serial.print("Índice de calor: ");
-    Serial.print(indiceCalorDHT11);
-    Serial.println(" *C ");
-#endif
+    // Obtenemos la temperatura
+    mqttPublicar = mqttPublicar && obtenerTempDHT11();
+    // Obtenemos la humedad
+    mqttPublicar = mqttPublicar && obtenerHumDHT11();
+
+    float indiceCalorDHT11;
+    if (mqttPublicar) {
+      // Obtenemos el índice de calor
+      indiceCalorDHT11 = obtenerIndiceDHT11();
+    }
 
     // Envío de datos al broker MQTT
-    if (temperaturaDHT11 != -100.0) {
+    if (mqttPublicar) {
       // Temperatura
-      mqttPublicarTemperatura(temperaturaDHT11);
+      mqttPublicarTemperatura();
+      // Humedad
+      mqttPublicarHumedadExt();
     }
   }
 }
