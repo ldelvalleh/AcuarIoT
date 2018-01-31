@@ -62,7 +62,7 @@ const char mqttTopicPhAgua[] = "casa/servidor/phagua";
 
 RunningAverage mediaTemperatura(50);
 RunningAverage mediaHumedad(50);
-RunningAverage mediaTemperaturaAgua(50);
+RunningAverage mediaTemperaturaAgua(5);
 
 /*
    Cálculo temperatura agua

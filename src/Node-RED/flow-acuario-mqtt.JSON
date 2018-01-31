@@ -22,7 +22,7 @@
         "name": "Temperatura Ambiente",
         "group": "a8b21296.be1ab",
         "order": 0,
-        "width": "4",
+        "width": "3",
         "height": "3",
         "gtype": "gage",
         "title": "Temperatura",
@@ -64,7 +64,7 @@
         "name": "Humedad Ambiente",
         "group": "a8b21296.be1ab",
         "order": 0,
-        "width": "4",
+        "width": "3",
         "height": "3",
         "gtype": "gage",
         "title": "Humedad",
@@ -113,7 +113,7 @@
         "label": "ºC",
         "format": "{{value}}",
         "min": "15",
-        "max": "30",
+        "max": "35",
         "colors": [
             "#00b500",
             "#b38c33",
@@ -145,8 +145,8 @@
         "name": "Luz on",
         "group": "c9f85a38.cc5598",
         "order": 0,
-        "width": "2",
-        "height": "2",
+        "width": "4",
+        "height": "3",
         "passthru": false,
         "label": "Luz on",
         "color": "",
@@ -159,7 +159,8 @@
         "y": 95,
         "wires": [
             [
-                "9b36be69.6167d"
+                "9b36be69.6167d",
+                "16a51a47.6126b6"
             ]
         ]
     },
@@ -170,8 +171,8 @@
         "name": "Luz off",
         "group": "c9f85a38.cc5598",
         "order": 0,
-        "width": "2",
-        "height": "2",
+        "width": "4",
+        "height": "3",
         "passthru": false,
         "label": "Luz off",
         "color": "",
@@ -184,7 +185,8 @@
         "y": 161,
         "wires": [
             [
-                "17dd9ac4.a96265"
+                "17dd9ac4.a96265",
+                "16a51a47.6126b6"
             ]
         ]
     },
@@ -266,7 +268,7 @@
         "name": "Indice Calor Abmiente",
         "group": "a8b21296.be1ab",
         "order": 0,
-        "width": "4",
+        "width": "3",
         "height": "3",
         "gtype": "gage",
         "title": "Sensación calor",
@@ -310,9 +312,294 @@
         "type": "comment",
         "z": "c8c41cc4.68e22",
         "name": "Acciones",
-        "info": "Parámetros obtenidos del sensor DHT11",
+        "info": "",
         "x": 868,
         "y": 44,
+        "wires": []
+    },
+    {
+        "id": "c4f98a32.e4a678",
+        "type": "ui_text_input",
+        "z": "c8c41cc4.68e22",
+        "name": "",
+        "label": "Encendido",
+        "group": "212439cf.c03b36",
+        "order": 0,
+        "width": "4",
+        "height": "3",
+        "passthru": false,
+        "mode": "time",
+        "delay": 300,
+        "topic": "",
+        "x": 877,
+        "y": 518,
+        "wires": [
+            [
+                "eb3d7b89.7e2bb8"
+            ]
+        ]
+    },
+    {
+        "id": "f35303c4.a3cac",
+        "type": "ui_text_input",
+        "z": "c8c41cc4.68e22",
+        "name": "",
+        "label": "Apagado",
+        "group": "212439cf.c03b36",
+        "order": 0,
+        "width": "4",
+        "height": "3",
+        "passthru": false,
+        "mode": "time",
+        "delay": 300,
+        "topic": "",
+        "x": 877,
+        "y": 815,
+        "wires": [
+            [
+                "ca40685f.dd06f8"
+            ]
+        ]
+    },
+    {
+        "id": "ad079bb0.7994d8",
+        "type": "comment",
+        "z": "c8c41cc4.68e22",
+        "name": "Programación luces",
+        "info": "",
+        "x": 203,
+        "y": 610,
+        "wires": []
+    },
+    {
+        "id": "5ba08ff1.786e",
+        "type": "file in",
+        "z": "c8c41cc4.68e22",
+        "name": "Leer programación",
+        "filename": "programacion.txt",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": true,
+        "x": 440,
+        "y": 677,
+        "wires": [
+            [
+                "266d80b.0e8208"
+            ]
+        ]
+    },
+    {
+        "id": "f7ca3fbf.8bc79",
+        "type": "inject",
+        "z": "c8c41cc4.68e22",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 209,
+        "y": 677,
+        "wires": [
+            [
+                "5ba08ff1.786e"
+            ]
+        ]
+    },
+    {
+        "id": "266d80b.0e8208",
+        "type": "function",
+        "z": "c8c41cc4.68e22",
+        "name": "Obtiene programación",
+        "func": "// Separamos los datos\nvar splitHoras = msg.payload.split(\"$\");\n\n// Creo los dos mensajes\nvar msg1 = { payload: splitHoras[0]};\nvar msg2 = { payload: splitHoras[1]};\n\n// Variable ambito flow\nflow.set('encendidoLuz', splitHoras[0]);\nflow.set('apagadoLuz', splitHoras[1]);\n\n// Devuelvo las dos salidas\nreturn [msg1, msg2];",
+        "outputs": "2",
+        "noerr": 0,
+        "x": 681,
+        "y": 677,
+        "wires": [
+            [
+                "c4f98a32.e4a678"
+            ],
+            [
+                "f35303c4.a3cac"
+            ]
+        ]
+    },
+    {
+        "id": "eb3d7b89.7e2bb8",
+        "type": "function",
+        "z": "c8c41cc4.68e22",
+        "name": "Conversión",
+        "func": "// Obtención de la fecha\nvar date = new Date(msg.payload);\n\n// Almacenamos en variable ambito flow\nflow.set('encendidoLuz', date.getHours().toString().padStart(2,\"0\")+\":\"+date.getMinutes().toString().padEnd(2,\"0\"));\n\n\n\n// Montamos el mensaje\nmsg1 = {payload:flow.get('encendidoLuz')+'$'+flow.get('apagadoLuz')};\n\nreturn msg1;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1017,
+        "y": 619,
+        "wires": [
+            [
+                "4102a2c8.68964c"
+            ]
+        ]
+    },
+    {
+        "id": "ca40685f.dd06f8",
+        "type": "function",
+        "z": "c8c41cc4.68e22",
+        "name": "Conversión",
+        "func": "// Obtención de la fecha\nvar date = new Date(msg.payload);\n\n// Almacenamos en variable ambito flow\nflow.set('apagadoLuz', date.getHours().toString().padStart(2,\"0\")+\":\"+date.getMinutes().toString().padEnd(2,\"0\"));\n\n// Montamos el mensaje\nmsg1 = {payload:flow.get('encendidoLuz')+'$'+flow.get('apagadoLuz')};\n\nreturn msg1;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1019,
+        "y": 692,
+        "wires": [
+            [
+                "4102a2c8.68964c"
+            ]
+        ]
+    },
+    {
+        "id": "4102a2c8.68964c",
+        "type": "file",
+        "z": "c8c41cc4.68e22",
+        "name": "Guardar programación",
+        "filename": "programacion.txt",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "x": 1215,
+        "y": 650,
+        "wires": []
+    },
+    {
+        "id": "d8abe037.5c1ca",
+        "type": "inject",
+        "z": "c8c41cc4.68e22",
+        "name": "Temporizador tareas",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "20",
+        "crontab": "",
+        "once": true,
+        "x": 815,
+        "y": 325,
+        "wires": [
+            [
+                "15f22f36.ad21e1"
+            ]
+        ]
+    },
+    {
+        "id": "16a51a47.6126b6",
+        "type": "function",
+        "z": "c8c41cc4.68e22",
+        "name": "Estado de la luz",
+        "func": "// Variable ambito flow\nflow.set('luzEstado', msg.payload);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1099,
+        "y": 234,
+        "wires": [
+            [
+                "b96dc24d.a475f"
+            ]
+        ]
+    },
+    {
+        "id": "b96dc24d.a475f",
+        "type": "debug",
+        "z": "c8c41cc4.68e22",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 1294,
+        "y": 235,
+        "wires": []
+    },
+    {
+        "id": "15f22f36.ad21e1",
+        "type": "function",
+        "z": "c8c41cc4.68e22",
+        "name": "Luces programadas",
+        "func": "// Obtenemos fecha actual\nvar fecha = new Date();\n\n// Estado actual de la luz\nvar estadoLuz = parseInt(flow.get('luzEstado'));\n\n// Establecemos no actualización\nmsg.payload = -1;\n\n// Comprobamos si está encendido o apagado\nif(estadoLuz === 0){\n    // Obtenemos el valor de la hora y minutos\n    var horaMinutos = flow.get('encendidoLuz').toString().split(\":\");\n    var hora = parseInt(horaMinutos[0]);\n    var minutos = parseInt(horaMinutos[1]);\n    \n    // Comprobamos si encendemos\n    if(hora >= fecha.getHours() && minutos >= fecha.getMinutes()){\n        // Cambiamos estado\n        flow.set('luzEstado', 1);\n        // Activamos encendido de luces\n        msg.payload = 1;\n    }\n}else{\n    // Obtenemos el valor de la hora y minutos\n    var horaMinutos = flow.get('apagadoLuz');\n    var hora = parseInt(horaMinutos[0]);\n    var minutos = parseInt(horaMinutos[1]);\n    \n    // Comprobamos si encendemos\n    if(hora >= fecha.getHours() && minutos >= fecha.getMinutes()){\n        // Cambiamos estado\n        flow.set('luzEstado', 0);\n        // Activamos encendido de luces\n        msg.payload = 0;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1087,
+        "y": 326,
+        "wires": [
+            [
+                "79da4e74.7e541"
+            ]
+        ]
+    },
+    {
+        "id": "79da4e74.7e541",
+        "type": "switch",
+        "z": "c8c41cc4.68e22",
+        "name": "Switch encendido",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "-1",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 1316,
+        "y": 325,
+        "wires": [
+            [
+                "28aab8af.59f0c8"
+            ],
+            [
+                "a9ee9ae1.73cc78",
+                "b886351.09620c8"
+            ]
+        ]
+    },
+    {
+        "id": "a9ee9ae1.73cc78",
+        "type": "mqtt out",
+        "z": "c8c41cc4.68e22",
+        "name": "Luz",
+        "topic": "casa/acuario/acciones/luz",
+        "qos": "2",
+        "retain": "",
+        "broker": "4d4b1ff.7bc1ee",
+        "x": 1536,
+        "y": 371,
+        "wires": []
+    },
+    {
+        "id": "28aab8af.59f0c8",
+        "type": "debug",
+        "z": "c8c41cc4.68e22",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 1536,
+        "y": 272,
+        "wires": []
+    },
+    {
+        "id": "b886351.09620c8",
+        "type": "debug",
+        "z": "c8c41cc4.68e22",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 1571,
+        "y": 467,
         "wires": []
     },
     {
@@ -341,7 +628,7 @@
         "tab": "2dd77401.7accbc",
         "order": 1,
         "disp": true,
-        "width": "12"
+        "width": "9"
     },
     {
         "id": "4998b673.6c0708",
@@ -351,7 +638,7 @@
         "tab": "2dd77401.7accbc",
         "order": 2,
         "disp": true,
-        "width": "8"
+        "width": "9"
     },
     {
         "id": "c9f85a38.cc5598",
@@ -360,7 +647,17 @@
         "name": "Controles",
         "tab": "2dd77401.7accbc",
         "disp": true,
-        "width": "4"
+        "width": "9"
+    },
+    {
+        "id": "212439cf.c03b36",
+        "type": "ui_group",
+        "z": "",
+        "name": "Programación",
+        "tab": "2dd77401.7accbc",
+        "order": 5,
+        "disp": true,
+        "width": "9"
     },
     {
         "id": "2dd77401.7accbc",
