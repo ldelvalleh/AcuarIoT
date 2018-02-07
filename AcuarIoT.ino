@@ -412,15 +412,15 @@ void mqttPublicarTemperaturaAgua() {
 
    Propósito:   publica el pH en el broker MQTT
 
-   Parámetros: ninguno
+   Parámetros: float: valor de pH 
 
    Return:     void No devuelve nada
 */
-void mqttPublicarPh(){
+void mqttPublicarPh(float valorPh){
   char msg[32];
   snprintf(msg, 32, "%2.1f", obtenerPh());
   // Envío del mensaje al topic
-  mqttCliente.publish(mqttTopicPhAgua, msg);
+  mqttCliente.publish(mqttTopicTemperaturaAgua, msg);
 #ifdef ACUARIO_DEBUG
   Serial.print("[MQTT] Publicando mensaje ");
   Serial.print(msg);
@@ -525,8 +525,6 @@ void loop() {
       mqttPublicarIndiceExt(indiceCalorDHT11);
       // Publicar temperatura agua
       mqttPublicarTemperaturaAgua();
-      // Publicar pH
-      mqttPublicarPh();
     }
   }
 }
