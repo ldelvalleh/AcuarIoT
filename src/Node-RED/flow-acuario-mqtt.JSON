@@ -1,26 +1,33 @@
 [
     {
-        "id": "6c2e12c0.1724fc",
+        "id": "baf97aad.5c06f8",
+        "type": "tab",
+        "label": "AcuarIoT",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "5a8b04ad.b64cdc",
         "type": "mqtt in",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Temperatura Ambiente",
         "topic": "casa/servidor/tempext",
         "qos": "2",
-        "broker": "4d4b1ff.7bc1ee",
-        "x": 200,
-        "y": 100,
+        "broker": "55039030.311ea",
+        "x": 128.71428680419922,
+        "y": 104.28570747375488,
         "wires": [
             [
-                "69c3075.c2fc1f8"
+                "9cd3341.2f7fcc8"
             ]
         ]
     },
     {
-        "id": "69c3075.c2fc1f8",
+        "id": "9cd3341.2f7fcc8",
         "type": "ui_gauge",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Temperatura Ambiente",
-        "group": "a8b21296.be1ab",
+        "group": "88d5a2a0.8329a",
         "order": 0,
         "width": "3",
         "height": "3",
@@ -37,32 +44,32 @@
         ],
         "seg1": "",
         "seg2": "",
-        "x": 548,
-        "y": 102,
+        "x": 476.7142868041992,
+        "y": 106.28570747375488,
         "wires": []
     },
     {
-        "id": "e63a9bc9.c94c48",
+        "id": "1c8bc4e3.45bafb",
         "type": "mqtt in",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Humedad ambiente",
         "topic": "casa/servidor/humext",
         "qos": "2",
-        "broker": "4d4b1ff.7bc1ee",
-        "x": 190,
-        "y": 155,
+        "broker": "55039030.311ea",
+        "x": 121.71428680419922,
+        "y": 191.28570556640625,
         "wires": [
             [
-                "945762f3.402d4"
+                "d593a5e8.36ade8"
             ]
         ]
     },
     {
-        "id": "945762f3.402d4",
+        "id": "d593a5e8.36ade8",
         "type": "ui_gauge",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Humedad Ambiente",
-        "group": "a8b21296.be1ab",
+        "group": "88d5a2a0.8329a",
         "order": 0,
         "width": "3",
         "height": "3",
@@ -79,32 +86,33 @@
         ],
         "seg1": "",
         "seg2": "",
-        "x": 548,
-        "y": 155,
+        "x": 479.7142868041992,
+        "y": 191.28570556640625,
         "wires": []
     },
     {
-        "id": "cfe13839.f75928",
+        "id": "221ab63f.187c3a",
         "type": "mqtt in",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Temperatura",
         "topic": "casa/servidor/tempagua",
         "qos": "2",
-        "broker": "4d4b1ff.7bc1ee",
-        "x": 161,
-        "y": 365,
+        "broker": "55039030.311ea",
+        "x": 106.71429443359375,
+        "y": 481.2857036590576,
         "wires": [
             [
-                "557d39b5.646cd8"
+                "32ff36ee.c3d9ca",
+                "6aa00142.8de99"
             ]
         ]
     },
     {
-        "id": "557d39b5.646cd8",
+        "id": "32ff36ee.c3d9ca",
         "type": "ui_gauge",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Temperatura Agua",
-        "group": "4998b673.6c0708",
+        "group": "255325c.35707da",
         "order": 0,
         "width": "4",
         "height": "3",
@@ -121,110 +129,46 @@
         ],
         "seg1": "",
         "seg2": "",
-        "x": 512,
-        "y": 365,
+        "x": 457.71429443359375,
+        "y": 481.2857036590576,
         "wires": []
     },
     {
-        "id": "9b36be69.6167d",
+        "id": "d728bbaa.b1f1d8",
         "type": "mqtt out",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Luz",
-        "topic": "casa/acuario/acciones/luz",
-        "qos": "2",
+        "topic": "casa/acuario/luz",
+        "qos": "1",
         "retain": "",
-        "broker": "4d4b1ff.7bc1ee",
-        "x": 1160.5,
-        "y": 97,
+        "broker": "55039030.311ea",
+        "x": 1866.3809776306152,
+        "y": 287.6190347671509,
         "wires": []
     },
     {
-        "id": "3a93cbb0.98c324",
-        "type": "ui_button",
-        "z": "c8c41cc4.68e22",
-        "name": "Luz on",
-        "group": "c9f85a38.cc5598",
-        "order": 0,
-        "width": "4",
-        "height": "3",
-        "passthru": false,
-        "label": "Luz on",
-        "color": "",
-        "bgcolor": "#147732",
-        "icon": "fa-lightbulb-o ",
-        "payload": "1",
-        "payloadType": "str",
-        "topic": "",
-        "x": 861.5,
-        "y": 95,
-        "wires": [
-            [
-                "9b36be69.6167d",
-                "16a51a47.6126b6"
-            ]
-        ]
-    },
-    {
-        "id": "198996d3.3ac929",
-        "type": "ui_button",
-        "z": "c8c41cc4.68e22",
-        "name": "Luz off",
-        "group": "c9f85a38.cc5598",
-        "order": 0,
-        "width": "4",
-        "height": "3",
-        "passthru": false,
-        "label": "Luz off",
-        "color": "",
-        "bgcolor": "#910b0b",
-        "icon": "fa-lightbulb-o ",
-        "payload": "0",
-        "payloadType": "str",
-        "topic": "",
-        "x": 863,
-        "y": 161,
-        "wires": [
-            [
-                "17dd9ac4.a96265",
-                "16a51a47.6126b6"
-            ]
-        ]
-    },
-    {
-        "id": "17dd9ac4.a96265",
-        "type": "mqtt out",
-        "z": "c8c41cc4.68e22",
-        "name": "Luz",
-        "topic": "casa/acuario/acciones/luz",
-        "qos": "2",
-        "retain": "",
-        "broker": "4d4b1ff.7bc1ee",
-        "x": 1157,
-        "y": 161,
-        "wires": []
-    },
-    {
-        "id": "616c4887.e15f38",
+        "id": "cbe508fd.b0c458",
         "type": "mqtt in",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "PH",
         "topic": "casa/servidor/phagua",
         "qos": "2",
-        "broker": "4d4b1ff.7bc1ee",
-        "x": 143,
-        "y": 418,
+        "broker": "55039030.311ea",
+        "x": 78.71429443359375,
+        "y": 679.999963760376,
         "wires": [
             [
-                "b0189814.c2b7c8"
+                "c0db9daf.40ca6",
+                "4b2e71eb.0e735"
             ]
         ]
     },
     {
-        "id": "b0189814.c2b7c8",
+        "id": "c0db9daf.40ca6",
         "type": "ui_gauge",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "PH Agua",
-        "group": "4998b673.6c0708",
+        "group": "255325c.35707da",
         "order": 0,
         "width": "4",
         "height": "3",
@@ -241,32 +185,32 @@
         ],
         "seg1": "",
         "seg2": "",
-        "x": 484,
-        "y": 418,
+        "x": 419.71429443359375,
+        "y": 679.999963760376,
         "wires": []
     },
     {
-        "id": "2486f0b0.fe51d",
+        "id": "ae166788.57f8c8",
         "type": "mqtt in",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Indice Calor Ambiente",
         "topic": "casa/servidor/indiceext",
         "qos": "2",
-        "broker": "4d4b1ff.7bc1ee",
-        "x": 198,
-        "y": 224,
+        "broker": "55039030.311ea",
+        "x": 127.71429443359375,
+        "y": 297.28570556640625,
         "wires": [
             [
-                "8ad3b6ce.a05a08"
+                "545292c4.4386ec"
             ]
         ]
     },
     {
-        "id": "8ad3b6ce.a05a08",
+        "id": "545292c4.4386ec",
         "type": "ui_gauge",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Indice Calor Abmiente",
-        "group": "a8b21296.be1ab",
+        "group": "88d5a2a0.8329a",
         "order": 0,
         "width": "3",
         "height": "3",
@@ -283,261 +227,202 @@
         ],
         "seg1": "",
         "seg2": "",
-        "x": 546,
-        "y": 224,
+        "x": 475.71429443359375,
+        "y": 297.28570556640625,
         "wires": []
     },
     {
-        "id": "1e591228.46170e",
+        "id": "41ec93c6.ae457c",
         "type": "comment",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Parámetros Ambiente",
         "info": "Parámetros obtenidos del sensor DHT11",
-        "x": 203,
-        "y": 49,
+        "x": 131.71428680419922,
+        "y": 53.28570747375488,
         "wires": []
     },
     {
-        "id": "d7b2ec63.57fe8",
+        "id": "85c733c3.e1128",
         "type": "comment",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Parámetros Agua",
         "info": "",
-        "x": 171,
-        "y": 319,
+        "x": 98.71428680419922,
+        "y": 430.28570556640625,
         "wires": []
     },
     {
-        "id": "98407b8c.c6ea88",
+        "id": "365d4fe0.fabae",
         "type": "comment",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Acciones",
         "info": "",
-        "x": 868,
-        "y": 44,
+        "x": 1568.3809776306152,
+        "y": 246.61903476715088,
         "wires": []
     },
     {
-        "id": "c4f98a32.e4a678",
+        "id": "dd3af895.feea68",
         "type": "ui_text_input",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "",
         "label": "Encendido",
-        "group": "212439cf.c03b36",
+        "group": "5807d0e1.252f2",
         "order": 0,
         "width": "4",
         "height": "3",
         "passthru": false,
         "mode": "time",
-        "delay": 300,
+        "delay": "300",
         "topic": "",
-        "x": 877,
-        "y": 518,
+        "x": 1563.571434020996,
+        "y": 114.38091087341309,
         "wires": [
             [
-                "eb3d7b89.7e2bb8"
+                "fabe96b.6912368"
             ]
         ]
     },
     {
-        "id": "f35303c4.a3cac",
+        "id": "ac9edc55.ec2cc",
         "type": "ui_text_input",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "",
         "label": "Apagado",
-        "group": "212439cf.c03b36",
+        "group": "5807d0e1.252f2",
         "order": 0,
         "width": "4",
         "height": "3",
         "passthru": false,
         "mode": "time",
-        "delay": 300,
+        "delay": "300",
         "topic": "",
-        "x": 877,
-        "y": 815,
+        "x": 1551.571434020996,
+        "y": 190.0952663421631,
         "wires": [
             [
-                "ca40685f.dd06f8"
+                "1af71b40.4131c5"
             ]
         ]
     },
     {
-        "id": "ad079bb0.7994d8",
+        "id": "7fbe8eec.9a9df",
         "type": "comment",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Programación luces",
         "info": "",
-        "x": 203,
-        "y": 610,
+        "x": 837.4285583496094,
+        "y": 128.09521865844727,
         "wires": []
     },
     {
-        "id": "5ba08ff1.786e",
-        "type": "file in",
-        "z": "c8c41cc4.68e22",
-        "name": "Leer programación",
-        "filename": "programacion.txt",
-        "format": "utf8",
-        "chunk": false,
-        "sendError": true,
-        "x": 440,
-        "y": 677,
-        "wires": [
-            [
-                "266d80b.0e8208"
-            ]
-        ]
-    },
-    {
-        "id": "f7ca3fbf.8bc79",
+        "id": "1b946f89.2a204",
         "type": "inject",
-        "z": "c8c41cc4.68e22",
-        "name": "",
-        "topic": "",
+        "z": "baf97aad.5c06f8",
+        "name": "Programación luces",
+        "topic": "select nombre, valor from parametros where nombre like 'luces%'",
         "payload": "",
         "payloadType": "date",
         "repeat": "",
         "crontab": "",
         "once": true,
-        "x": 209,
-        "y": 677,
+        "onceDelay": "0.1",
+        "x": 867.7142944335938,
+        "y": 189.381010055542,
         "wires": [
             [
-                "5ba08ff1.786e"
+                "cd111395.da176"
             ]
         ]
     },
     {
-        "id": "266d80b.0e8208",
+        "id": "fabe96b.6912368",
         "type": "function",
-        "z": "c8c41cc4.68e22",
-        "name": "Obtiene programación",
-        "func": "// Separamos los datos\nvar splitHoras = msg.payload.split(\"$\");\n\n// Creo los dos mensajes\nvar msg1 = { payload: splitHoras[0]};\nvar msg2 = { payload: splitHoras[1]};\n\n// Variable ambito flow\nflow.set('encendidoLuz', splitHoras[0]);\nflow.set('apagadoLuz', splitHoras[1]);\n\n// Devuelvo las dos salidas\nreturn [msg1, msg2];",
-        "outputs": "2",
-        "noerr": 0,
-        "x": 681,
-        "y": 677,
-        "wires": [
-            [
-                "c4f98a32.e4a678"
-            ],
-            [
-                "f35303c4.a3cac"
-            ]
-        ]
-    },
-    {
-        "id": "eb3d7b89.7e2bb8",
-        "type": "function",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Conversión",
-        "func": "// Obtención de la fecha\nvar date = new Date(msg.payload);\n\n// Almacenamos en variable ambito flow\nflow.set('encendidoLuz', date.getHours().toString().padStart(2,\"0\")+\":\"+date.getMinutes().toString().padEnd(2,\"0\"));\n\n\n\n// Montamos el mensaje\nmsg1 = {payload:flow.get('encendidoLuz')+'$'+flow.get('apagadoLuz')};\n\nreturn msg1;",
+        "func": "// Obtención de la fecha\nvar dateUtc = new Date();\nvar date = new Date(msg.payload + dateUtc.getTimezoneOffset()*60*1000);\n\n// Almacenamos en variable ambito flow\nflow.set('lucesOn', date.getHours().toString().padStart(2,\"0\")+\":\"+date.getMinutes().toString().padStart(2,\"0\"));\n\n// Montamos la query\nvar newMsg = {topic : \"update parametros set VALOR = '\"+ flow.get('lucesOn')+\"' where NOMBRE = 'lucesOn'\"};\n\nreturn newMsg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 1017,
-        "y": 619,
+        "x": 1730.571434020996,
+        "y": 113.95238304138184,
         "wires": [
             [
-                "4102a2c8.68964c"
+                "687a53c0.0d131c"
             ]
         ]
     },
     {
-        "id": "ca40685f.dd06f8",
+        "id": "1af71b40.4131c5",
         "type": "function",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Conversión",
-        "func": "// Obtención de la fecha\nvar date = new Date(msg.payload);\n\n// Almacenamos en variable ambito flow\nflow.set('apagadoLuz', date.getHours().toString().padStart(2,\"0\")+\":\"+date.getMinutes().toString().padEnd(2,\"0\"));\n\n// Montamos el mensaje\nmsg1 = {payload:flow.get('encendidoLuz')+'$'+flow.get('apagadoLuz')};\n\nreturn msg1;",
+        "func": "// Obtención de la fecha\nvar dateUtc = new Date();\nvar date = new Date(msg.payload + dateUtc.getTimezoneOffset()*60*1000);\n\n// Almacenamos en variable ambito flow\nflow.set('lucesOff', date.getHours().toString().padStart(2,\"0\")+\":\"+date.getMinutes().toString().padStart(2,\"0\"));\n\n// Montamos la query\nvar newMsg = {topic : \"update parametros set VALOR = '\"+ flow.get('lucesOff')+\"' where NOMBRE = 'lucesOff'\"};\n\nreturn newMsg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 1019,
-        "y": 692,
+        "x": 1729.571434020996,
+        "y": 189.95238304138184,
         "wires": [
             [
-                "4102a2c8.68964c"
+                "1d85be5d.0e37f2"
             ]
         ]
     },
     {
-        "id": "4102a2c8.68964c",
-        "type": "file",
-        "z": "c8c41cc4.68e22",
-        "name": "Guardar programación",
-        "filename": "programacion.txt",
-        "appendNewline": false,
-        "createDir": false,
-        "overwriteFile": "true",
-        "x": 1215,
-        "y": 650,
-        "wires": []
-    },
-    {
-        "id": "d8abe037.5c1ca",
+        "id": "ee7f8edb.314af",
         "type": "inject",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Temporizador tareas",
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "repeat": "20",
+        "repeat": "60",
         "crontab": "",
         "once": true,
-        "x": 815,
-        "y": 325,
+        "onceDelay": "",
+        "x": 869.2976226806641,
+        "y": 401.53565311431885,
         "wires": [
             [
-                "15f22f36.ad21e1"
+                "76aa136b.e6055c"
             ]
         ]
     },
     {
-        "id": "16a51a47.6126b6",
+        "id": "335d1c40.ad3b74",
         "type": "function",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Estado de la luz",
-        "func": "// Variable ambito flow\nflow.set('luzEstado', msg.payload);\n\nreturn msg;",
+        "func": "// Variable ambito flow\nflow.set('lucesEstado', msg.payload);\n\n// Montamos la query actualizar estado\nvar newMsg = {topic : \"update parametros set VALOR = '\"+ flow.get('lucesEstado') +\"' where NOMBRE = 'lucesEstado'\"};\n\nreturn newMsg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 1099,
-        "y": 234,
+        "x": 1808.3809776306152,
+        "y": 360.6190347671509,
         "wires": [
             [
-                "b96dc24d.a475f"
+                "87aeb5fe.9f6248"
             ]
         ]
     },
     {
-        "id": "b96dc24d.a475f",
-        "type": "debug",
-        "z": "c8c41cc4.68e22",
-        "name": "",
-        "active": true,
-        "console": "false",
-        "complete": "false",
-        "x": 1294,
-        "y": 235,
-        "wires": []
-    },
-    {
-        "id": "15f22f36.ad21e1",
+        "id": "3a534f47.e596",
         "type": "function",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Luces programadas",
-        "func": "// Obtenemos fecha actual\nvar fecha = new Date();\n\n// Estado actual de la luz\nvar estadoLuz = parseInt(flow.get('luzEstado'));\n\n// Establecemos no actualización\nmsg.payload = -1;\n\n// Comprobamos si está encendido o apagado\nif(estadoLuz === 0){\n    // Obtenemos el valor de la hora y minutos\n    var horaMinutos = flow.get('encendidoLuz').toString().split(\":\");\n    var hora = parseInt(horaMinutos[0]);\n    var minutos = parseInt(horaMinutos[1]);\n    \n    // Comprobamos si encendemos\n    if(hora >= fecha.getHours() && minutos >= fecha.getMinutes()){\n        // Cambiamos estado\n        flow.set('luzEstado', 1);\n        // Activamos encendido de luces\n        msg.payload = 1;\n    }\n}else{\n    // Obtenemos el valor de la hora y minutos\n    var horaMinutos = flow.get('apagadoLuz');\n    var hora = parseInt(horaMinutos[0]);\n    var minutos = parseInt(horaMinutos[1]);\n    \n    // Comprobamos si encendemos\n    if(hora >= fecha.getHours() && minutos >= fecha.getMinutes()){\n        // Cambiamos estado\n        flow.set('luzEstado', 0);\n        // Activamos encendido de luces\n        msg.payload = 0;\n    }\n}\n\nreturn msg;",
+        "func": "// Obtenemos fecha actual\nvar fecha = new Date();\n\n// Estado actual de la luz\nvar estadoLuz = parseInt(flow.get('luzEstado'));\n\n// Comprobamos si existe el estado de la luz\nif (typeof estadoLuz === \"undefined\") {\n\n    // Comprobación estado\n    // Obtenemos el valor de la hora y minutos\n    var horaMinutos = flow.get('encendidoLuz').toString().split(\":\");\n    var hora = parseInt(horaMinutos[0]);\n    var minutos = parseInt(horaMinutos[1]);\n\n    // Comprobamos si encendemos\n    if(hora >= fecha.getHours() && minutos >= fecha.getMinutes()){\n        // Cambiamos estado\n        flow.set('luzEstado', 1);\n        // Activamos encendido de luces\n        msg.payload = 1;\n    }else{\n        // Cambiamos estado\n        flow.set('luzEstado', 0);\n        // Activamos encendido de luces\n        msg.payload = 0;\n    }\n    return msg;\n}\n\n// Establecemos no actualización\nmsg.payload = -1;\n\n// Comprobamos si está encendido o apagado\nif(estadoLuz === 0){\n\n    // Obtenemos el valor de la hora y minutos\n    var horaMinutos = flow.get('encendidoLuz').toString().split(\":\");\n    var hora = parseInt(horaMinutos[0]);\n    var minutos = parseInt(horaMinutos[1]);\n\n    // Comprobamos si encendemos\n    if(hora >= fecha.getHours() && minutos >= fecha.getMinutes()){\n        node.warn(\"Apagado/Encendido\");\n        // Cambiamos estado\n        flow.set('luzEstado', 1);\n        // Activamos encendido de luces\n        msg.payload = 1;\n    }\n}else{\n\n    // Obtenemos el valor de la hora y minutos\n    var horaMinutos = flow.get('apagadoLuz').toString().split(\":\");\n    var hora = parseInt(horaMinutos[0]);\n    var minutos = parseInt(horaMinutos[1]);\n\n    // Comprobamos si encendemos\n    if(hora <= fecha.getHours() && minutos < fecha.getMinutes()){\n        node.warn(\"Encendido/Apagado\");\n        // Cambiamos estado\n        flow.set('luzEstado', 0);\n        // Activamos encendido de luces\n        msg.payload = 0;\n    }\n}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 1087,
-        "y": 326,
+        "x": 1265.0475845336914,
+        "y": 556.2856292724609,
         "wires": [
             [
-                "79da4e74.7e541"
+                "dde8c81e.55a118"
             ]
         ]
     },
     {
-        "id": "79da4e74.7e541",
+        "id": "dde8c81e.55a118",
         "type": "switch",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Switch encendido",
         "property": "payload",
         "propertyType": "msg",
@@ -552,61 +437,522 @@
             }
         ],
         "checkall": "true",
+        "repair": false,
         "outputs": 2,
-        "x": 1316,
-        "y": 325,
+        "x": 1494.0475845336914,
+        "y": 559.2856292724609,
         "wires": [
             [
-                "28aab8af.59f0c8"
+                "90affa11.85bdc8"
             ],
             [
-                "a9ee9ae1.73cc78",
-                "b886351.09620c8"
+                "885ddbbf.f86c68",
+                "9835c925.adf268"
             ]
         ]
     },
     {
-        "id": "a9ee9ae1.73cc78",
+        "id": "885ddbbf.f86c68",
         "type": "mqtt out",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "Luz",
-        "topic": "casa/acuario/acciones/luz",
+        "topic": "casa/acuario/luz",
         "qos": "2",
         "retain": "",
-        "broker": "4d4b1ff.7bc1ee",
-        "x": 1536,
-        "y": 371,
+        "broker": "55039030.311ea",
+        "x": 1714.0475845336914,
+        "y": 594.2856292724609,
         "wires": []
     },
     {
-        "id": "28aab8af.59f0c8",
+        "id": "90affa11.85bdc8",
         "type": "debug",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "",
-        "active": true,
+        "active": false,
         "console": "false",
         "complete": "payload",
-        "x": 1536,
-        "y": 272,
+        "x": 1715.0475845336914,
+        "y": 487.28562927246094,
         "wires": []
     },
     {
-        "id": "b886351.09620c8",
+        "id": "9835c925.adf268",
         "type": "debug",
-        "z": "c8c41cc4.68e22",
+        "z": "baf97aad.5c06f8",
         "name": "",
-        "active": true,
+        "active": false,
         "console": "false",
         "complete": "payload",
-        "x": 1571,
-        "y": 467,
+        "x": 1749.0475845336914,
+        "y": 697.2856292724609,
         "wires": []
     },
     {
-        "id": "4d4b1ff.7bc1ee",
+        "id": "76aa136b.e6055c",
+        "type": "function",
+        "z": "baf97aad.5c06f8",
+        "name": "Luces programadas",
+        "func": "// Obtenemos fecha actual\nvar fecha = new Date();\n\n// Fecha de encendido\nvar horaMinutos = flow.get('lucesOn').toString().split(\":\");\nvar horaOn = parseInt(horaMinutos[0]);\nvar minutosOn = parseInt(horaMinutos[1]);\n\n// Fecha de apagado\nhoraMinutos = flow.get('lucesOff').toString().split(\":\");\nvar horaOff = parseInt(horaMinutos[0]);\nvar minutosOff = parseInt(horaMinutos[1]);\n\nmsg.payload = -1;\n\n// Si la fecha anterior es igual a la fecha de encendido\nif(fecha.getHours() == horaOn && fecha.getMinutes() == minutosOn){\n    // Encendemos\n    msg.payload = 1;\n} else if (fecha.getHours() == horaOff && fecha.getMinutes() == minutosOff){\n    // Apagamos\n    msg.payload = 0;\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1125.4723052978516,
+        "y": 401.58331871032715,
+        "wires": [
+            [
+                "e13ef236.80054"
+            ]
+        ]
+    },
+    {
+        "id": "34872d96.044212",
+        "type": "comment",
+        "z": "baf97aad.5c06f8",
+        "name": "Crear tablas",
+        "info": "",
+        "x": 122.5,
+        "y": 907.5,
+        "wires": []
+    },
+    {
+        "id": "ada822ad.7794a",
+        "type": "inject",
+        "z": "baf97aad.5c06f8",
+        "name": "CREATE parametros",
+        "topic": "CREATE TABLE parametros(TIMESTAMP INT PRIMARY KEY NOT NULL, NOMBRE VARCHAR(10) NOT NULL,VALOR VARCHAR(15) NOT NULL)",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 286.25,
+        "y": 1003.7500152587891,
+        "wires": [
+            [
+                "318ac2cc.23425e"
+            ]
+        ]
+    },
+    {
+        "id": "318ac2cc.23425e",
+        "type": "sqlite",
+        "z": "baf97aad.5c06f8",
+        "mydb": "f1c2e5ee.000048",
+        "name": "CREATE parametros",
+        "x": 556.2500076293945,
+        "y": 1003.7500305175781,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5d8f8bc0.4e3be4",
+        "type": "inject",
+        "z": "baf97aad.5c06f8",
+        "name": "Parámetros por defecto",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 205,
+        "y": 1328,
+        "wires": [
+            [
+                "3a55fe71.5bdd92"
+            ]
+        ]
+    },
+    {
+        "id": "fb970e38.7d6d",
+        "type": "sqlite",
+        "z": "baf97aad.5c06f8",
+        "mydb": "f1c2e5ee.000048",
+        "name": "INSERT PARAMETROS",
+        "x": 646,
+        "y": 1328,
+        "wires": [
+            [
+                "b1f50782.3f2428"
+            ]
+        ]
+    },
+    {
+        "id": "299c599c.c75156",
+        "type": "comment",
+        "z": "baf97aad.5c06f8",
+        "name": "Parametros por defecto",
+        "info": "",
+        "x": 176,
+        "y": 1279,
+        "wires": []
+    },
+    {
+        "id": "3a55fe71.5bdd92",
+        "type": "function",
+        "z": "baf97aad.5c06f8",
+        "name": "insert",
+        "func": "var newMsg = {\n    \"topic\": \"INSERT INTO parametros VALUES (\"+parseInt(Date.now() / 1000)+\", 'lucesEstado','0')\"\n}\n\nvar newMsg2 = {\n    \"payload\" : \"0\"\n}\n\nreturn [newMsg, newMsg2];",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 417,
+        "y": 1329,
+        "wires": [
+            [
+                "fb970e38.7d6d"
+            ],
+            [
+                "c2ac093a.174298"
+            ]
+        ]
+    },
+    {
+        "id": "c2ac093a.174298",
+        "type": "mqtt out",
+        "z": "baf97aad.5c06f8",
+        "name": "Luz",
+        "topic": "casa/acuario/luz",
+        "qos": "2",
+        "retain": "",
+        "broker": "55039030.311ea",
+        "x": 607,
+        "y": 1373,
+        "wires": []
+    },
+    {
+        "id": "b1f50782.3f2428",
+        "type": "debug",
+        "z": "baf97aad.5c06f8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 882,
+        "y": 1321,
+        "wires": []
+    },
+    {
+        "id": "7aa7dc5c.c004c4",
+        "type": "inject",
+        "z": "baf97aad.5c06f8",
+        "name": "Parámetros por defecto",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 201,
+        "y": 1462,
+        "wires": [
+            [
+                "a9cdca39.ce6898"
+            ]
+        ]
+    },
+    {
+        "id": "cc9c6615.dae2f8",
+        "type": "sqlite",
+        "z": "baf97aad.5c06f8",
+        "mydb": "f1c2e5ee.000048",
+        "name": "INSERT PARAMETROS",
+        "x": 669,
+        "y": 1434,
+        "wires": [
+            [
+                "916bd95e.fe9038"
+            ]
+        ]
+    },
+    {
+        "id": "a9cdca39.ce6898",
+        "type": "function",
+        "z": "baf97aad.5c06f8",
+        "name": "insert",
+        "func": "var newMsg1 = {\n    \"topic\": \"INSERT INTO parametros VALUES (\"+parseInt(Date.now() / 1000)+\", 'lucesOn','10:00')\"\n}\n\nvar newMsg2 = {\n    \"topic\": \"INSERT INTO parametros VALUES (\"+parseInt(Date.now() / 1000) + 1 +\", 'lucesOff','18:00')\"\n}\n\nreturn [newMsg1, newMsg2];",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 420,
+        "y": 1464,
+        "wires": [
+            [
+                "cc9c6615.dae2f8"
+            ],
+            [
+                "3ee3bf1c.998a2"
+            ]
+        ]
+    },
+    {
+        "id": "916bd95e.fe9038",
+        "type": "debug",
+        "z": "baf97aad.5c06f8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 905,
+        "y": 1454,
+        "wires": []
+    },
+    {
+        "id": "3ee3bf1c.998a2",
+        "type": "sqlite",
+        "z": "baf97aad.5c06f8",
+        "mydb": "f1c2e5ee.000048",
+        "name": "INSERT PARAMETROS",
+        "x": 668,
+        "y": 1496,
+        "wires": [
+            [
+                "916bd95e.fe9038"
+            ]
+        ]
+    },
+    {
+        "id": "6aa00142.8de99",
+        "type": "ui_chart",
+        "z": "baf97aad.5c06f8",
+        "name": "",
+        "group": "255325c.35707da",
+        "order": 0,
+        "width": "8",
+        "height": "4",
+        "label": "Temperatura Agua",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "10",
+        "ymax": "40",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "x": 460,
+        "y": 428.5714416503906,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "4b2e71eb.0e735",
+        "type": "ui_chart",
+        "z": "baf97aad.5c06f8",
+        "name": "",
+        "group": "255325c.35707da",
+        "order": 0,
+        "width": "8",
+        "height": "4",
+        "label": "Ph Agua",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "10",
+        "ymax": "40",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "x": 418.5714416503906,
+        "y": 634.2857055664062,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "cd111395.da176",
+        "type": "sqlite",
+        "z": "baf97aad.5c06f8",
+        "mydb": "f1c2e5ee.000048",
+        "name": "Select parametros",
+        "x": 1110.0000228881836,
+        "y": 189.52382033211836,
+        "wires": [
+            [
+                "4be85e61.b9d14"
+            ]
+        ]
+    },
+    {
+        "id": "4be85e61.b9d14",
+        "type": "function",
+        "z": "baf97aad.5c06f8",
+        "name": "Obtiene programación",
+        "func": "// Mensajes a devolver\nvar msg1;\nvar msg2;\nvar msg3;\n\n// Separamos los datos\nfor(i=0; i<msg.payload.length; i++){\n    if(msg.payload[i].NOMBRE == \"lucesOn\"){\n        msg1 = { payload: msg.payload[i].VALOR};   \n        // Variable ambito flow\n        flow.set('lucesOn', msg1.payload);\n    }else if(msg.payload[i].NOMBRE == \"lucesOff\"){\n        msg2 = { payload: msg.payload[i].VALOR};\n        // Variable ambito flow\n        flow.set('lucesOff', msg2.payload);\n    }else if(msg.payload[i].NOMBRE == \"lucesEstado\"){\n        if(msg.payload[i].VALOR == '0'){\n            msg3 = { payload: 0};\n        }else{\n            msg3 = { payload: 1};\n        }\n        // Variable ambito flow\n        flow.set('lucesEstado', msg.payload[i].VALOR);\n    }\n}\n\n// Devuelvo las dos salidas\nreturn [msg1, msg2, msg3];",
+        "outputs": 3,
+        "noerr": 0,
+        "x": 1342.8572463989258,
+        "y": 189.52385139465332,
+        "wires": [
+            [
+                "dd3af895.feea68"
+            ],
+            [
+                "ac9edc55.ec2cc"
+            ],
+            [
+                "d8a1465f.714cf8"
+            ]
+        ]
+    },
+    {
+        "id": "687a53c0.0d131c",
+        "type": "sqlite",
+        "z": "baf97aad.5c06f8",
+        "mydb": "f1c2e5ee.000048",
+        "name": "Update lucesOn",
+        "x": 1930.1428451538086,
+        "y": 114.09526634216309,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1d85be5d.0e37f2",
+        "type": "sqlite",
+        "z": "baf97aad.5c06f8",
+        "mydb": "f1c2e5ee.000048",
+        "name": "Update lucesOff",
+        "x": 1933.571434020996,
+        "y": 190.0952663421631,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "87aeb5fe.9f6248",
+        "type": "sqlite",
+        "z": "baf97aad.5c06f8",
+        "mydb": "f1c2e5ee.000048",
+        "name": "Update estadoLuces",
+        "x": 2034.666690826416,
+        "y": 360.333327293396,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d8a1465f.714cf8",
+        "type": "ui_switch",
+        "z": "baf97aad.5c06f8",
+        "name": "",
+        "label": "Luz",
+        "group": "2dcf8a96.1121b6",
+        "order": 0,
+        "width": "2",
+        "height": "2",
+        "passthru": true,
+        "decouple": "false",
+        "topic": "",
+        "style": "",
+        "onvalue": "1",
+        "onvalueType": "num",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "0",
+        "offvalueType": "num",
+        "officon": "",
+        "offcolor": "",
+        "x": 1559.666690826416,
+        "y": 288.333327293396,
+        "wires": [
+            [
+                "335d1c40.ad3b74",
+                "d728bbaa.b1f1d8"
+            ]
+        ]
+    },
+    {
+        "id": "e13ef236.80054",
+        "type": "switch",
+        "z": "baf97aad.5c06f8",
+        "name": "Switch encendido",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "-1",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1352.5000228881836,
+        "y": 401.2500057220459,
+        "wires": [
+            [],
+            [
+                "6b31a925.ff1268",
+                "d8a1465f.714cf8"
+            ]
+        ]
+    },
+    {
+        "id": "6b31a925.ff1268",
+        "type": "mqtt out",
+        "z": "baf97aad.5c06f8",
+        "name": "Luz",
+        "topic": "casa/acuario/luz",
+        "qos": "2",
+        "retain": "",
+        "broker": "55039030.311ea",
+        "x": 1543.75,
+        "y": 427.5,
+        "wires": []
+    },
+    {
+        "id": "55039030.311ea",
         "type": "mqtt-broker",
         "z": "",
-        "broker": "192.168.0.155",
+        "name": "",
+        "broker": "192.168.0.167",
         "port": "1883",
         "clientid": "",
         "usetls": false,
@@ -621,46 +967,53 @@
         "birthPayload": ""
     },
     {
-        "id": "a8b21296.be1ab",
+        "id": "88d5a2a0.8329a",
         "type": "ui_group",
         "z": "",
         "name": "Ambiente",
-        "tab": "2dd77401.7accbc",
+        "tab": "6d789f98.7a72b",
         "order": 1,
         "disp": true,
         "width": "9"
     },
     {
-        "id": "4998b673.6c0708",
+        "id": "255325c.35707da",
         "type": "ui_group",
         "z": "",
         "name": "Agua",
-        "tab": "2dd77401.7accbc",
+        "tab": "6d789f98.7a72b",
         "order": 2,
         "disp": true,
         "width": "9"
     },
     {
-        "id": "c9f85a38.cc5598",
+        "id": "5807d0e1.252f2",
+        "type": "ui_group",
+        "z": "",
+        "name": "Programación luces",
+        "tab": "6d789f98.7a72b",
+        "order": 5,
+        "disp": true,
+        "width": "9",
+        "collapse": false
+    },
+    {
+        "id": "f1c2e5ee.000048",
+        "type": "sqlitedb",
+        "z": "",
+        "db": "/home/pi/acuariot.db"
+    },
+    {
+        "id": "2dcf8a96.1121b6",
         "type": "ui_group",
         "z": "",
         "name": "Controles",
-        "tab": "2dd77401.7accbc",
+        "tab": "6d789f98.7a72b",
         "disp": true,
         "width": "9"
     },
     {
-        "id": "212439cf.c03b36",
-        "type": "ui_group",
-        "z": "",
-        "name": "Programación",
-        "tab": "2dd77401.7accbc",
-        "order": 5,
-        "disp": true,
-        "width": "9"
-    },
-    {
-        "id": "2dd77401.7accbc",
+        "id": "6d789f98.7a72b",
         "type": "ui_tab",
         "z": "",
         "name": "Acuario",

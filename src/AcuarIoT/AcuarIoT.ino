@@ -15,6 +15,10 @@
 // DS18B20
 #include <DallasTemperature.h>
 
+// Pantalla OLED
+#include <Wire.h>
+#include "SSD1306.h"
+
 /*
    Debug
 */
@@ -47,9 +51,9 @@ int tiempoActualizacion = 15000;
    Configuración MQTT
 */
 PubSubClient mqttCliente(clienteEsp);
-const char* mqttServidor = "192.168.0.155";
+const char* mqttServidor = "192.168.0.167";
 const int mqttPuerto = 1883;
-const char mqttTopicAcciones[] = "casa/acuario/acciones";
+const char mqttTopicLuz[] = "casa/acuario/luz";
 const char mqttTopicTemperaturaExt[] = "casa/servidor/tempext";
 const char mqttTopicHumedadExt[] = "casa/servidor/humext";
 const char mqttTopicIndiceExt[] = "casa/servidor/indiceext";
@@ -68,10 +72,20 @@ RunningAverage mediaTemperaturaAgua(5);
    Cálculo temperatura agua
 */
 // Pin donde se conecta el bus 1-Wire
-const int ds18b20Pin = D6;
+const byte ds18b20Pin = D6;
 // Instancia a las clases OneWire y DallasTemperature
 OneWire ds18b20OneWireObjeto(ds18b20Pin);
 DallasTemperature ds18b20Sensor(&ds18b20OneWireObjeto);
+
+/*
+   Relé
+*/
+const byte relePin = D7;
+
+/*
+   Pantalla OLED
+*/
+SSD1306  display(0x3c, D3, D4);
 
 /*
    Definición: obtenerTempDHT11
@@ -200,12 +214,35 @@ void mqttCallback (char* topic, byte* mensaje, unsigned int longitud) {
 #ifdef ACUARIO_DEBUG
   Serial.print("[MQTT] Mensaje recibido [");
   Serial.print(topic);
+  Serial.print("--");
+  Serial.print(mqttTopicLuz);
   Serial.print("]: ");
   for (int i = 0; i < longitud; i++) {
     Serial.print((char)mensaje[i]);
   }
   Serial.println();
 #endif
+
+  // Señal para recibir un mensaje
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(1000);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(1000);
+
+  // Comprobamos el topic
+  if (String(topic) == mqttTopicLuz) {
+    // Sólo si tiene un carácter
+    if (longitud == 1) {
+      if (char(mensaje[0]) == '1') {
+        // Encendemos la luz
+        digitalWrite(relePin, HIGH);
+      } else {
+        // Apagamos la luz
+        digitalWrite(relePin, LOW);
+      }
+    }
+  }
+
 }
 
 /*
@@ -228,7 +265,7 @@ void mqttReconectar() {
 #ifdef ACUARIO_DEBUG
       Serial.println("[MQTT] Conectado al broker MQTT");
       // Subscripción al topic de acciones
-      mqttCliente.subscribe(mqttTopicAcciones);
+      mqttCliente.subscribe(mqttTopicLuz);
 #endif
     } else {
 #ifdef ACUARIO_DEBUG
@@ -336,8 +373,25 @@ void mqttPublicarTemperaturaAgua() {
 }
 
 void setup() {
+#ifdef ACUARIO_DEBUG
   // Inicializamos comunicación serie
   Serial.begin(115200);
+#endif
+
+  // Iniciamos la pantalla OLED
+  display.init();
+  display.setFont(ArialMT_Plain_10);
+
+  // Limpiamos la pantalla
+  display.clear();
+  display.setTextAlignment(TEXT_ALIGN_LEFT);
+  display.setFont(ArialMT_Plain_10);
+  display.drawString(0, 0, "Hello world");
+  display.display();
+
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
+  pinMode(relePin, OUTPUT);
 
   // Comenzamos el sensor DHT
   dht.begin();
@@ -361,9 +415,15 @@ void setup() {
 
   // Iniciamos el bus 1-Wire
   ds18b20Sensor.begin();
+
+  // Apagamos LED
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop() {
+  // Limpiamos pantalla OLED
+  display.clear();
+
   // Conexión con MQTT
   if (!mqttCliente.connected()) {
     // Volvemos a conectar
