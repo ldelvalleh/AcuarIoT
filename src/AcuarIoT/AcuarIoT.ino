@@ -18,6 +18,7 @@
 // Pantalla OLED
 #include <Wire.h>
 #include "SSD1306.h"
+#include "OLEDDisplayUi.h"
 
 /*
    Debug
@@ -51,7 +52,7 @@ int tiempoActualizacion = 15000;
    Configuración MQTT
 */
 PubSubClient mqttCliente(clienteEsp);
-const char* mqttServidor = "192.168.0.167";
+const char* mqttServidor = "192.168.1.100";
 const int mqttPuerto = 1883;
 const char mqttTopicLuz[] = "casa/acuario/luz";
 const char mqttTopicTemperaturaExt[] = "casa/servidor/tempext";
@@ -81,11 +82,13 @@ DallasTemperature ds18b20Sensor(&ds18b20OneWireObjeto);
    Relé
 */
 const byte relePin = D7;
+boolean releEstado = false;
 
 /*
    Pantalla OLED
 */
 SSD1306  display(0x3c, D3, D4);
+OLEDDisplayUi ui     ( &display );
 
 /*
    Sensor de Ph
@@ -93,6 +96,92 @@ SSD1306  display(0x3c, D3, D4);
 const byte phPin = A0;
 float phOffset = 0.00;
 RunningAverage mediaPh(40);
+/*
+  Pantallas a dibujar
+*/
+void drawFrame1(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
+  display->setTextAlignment(TEXT_ALIGN_CENTER);
+  display->setFont(ArialMT_Plain_10);
+  display->drawString(71 + x, 15 + y, "SENSACION TERMICA");
+
+  display->setFont(ArialMT_Plain_24);
+  display->drawString(70 + x, 34 + y, String(dht.computeHeatIndex(mediaTemperatura.getAverage(), mediaHumedad.getAverage(), false)));
+}
+
+void drawFrame2(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
+  display->setTextAlignment(TEXT_ALIGN_CENTER);
+  display->setFont(ArialMT_Plain_10);
+  display->drawString(71 + x, 15 + y, "TEMP AGUA");
+
+  display->setFont(ArialMT_Plain_24);
+  display->drawString(70 + x, 34 + y, String(mediaTemperaturaAgua.getAverage()));
+}
+
+void drawFrame3(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
+  display->setTextAlignment(TEXT_ALIGN_CENTER);
+  display->setFont(ArialMT_Plain_10);
+  display->drawString(71 + x, 15 + y, "PH AGUA");
+
+  display->setFont(ArialMT_Plain_24);
+  display->drawString(70 + x, 34 + y, String(obtenerPh()));
+}
+
+void drawFrame4(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
+  display->setTextAlignment(TEXT_ALIGN_CENTER);
+  display->setFont(ArialMT_Plain_10);
+  display->drawString(71 + x, 15 + y, "LUZ");
+
+  display->setFont(ArialMT_Plain_24);
+  display->drawString(70 + x, 34 + y, (releEstado?"ON":"OFF"));
+}
+
+void drawProgressBar(int fase) {
+  int progress = (fase / 5) % 100;
+  // draw the progress bar
+  display.drawProgressBar(0, 32, 120, 10, progress);
+
+  // draw the percentage as String
+  display.setTextAlignment(TEXT_ALIGN_CENTER);
+  display.drawString(64, 15, String(progress) + "%");
+}
+
+// Array con las pantallas
+FrameCallback frames[] = { drawFrame1, drawFrame2, drawFrame3, drawFrame4};
+int frameCount = 4;
+
+// Configuración de UI Oled
+void uiConfigOled(){
+  // The ESP is capable of rendering 60fps in 80Mhz mode
+  // but that won't give you much time for anything else
+  // run it in 160Mhz mode or just set it to 30 fps
+  ui.setTargetFPS(60);
+
+  // Customize the active and inactive symbol
+  //ui.setActiveSymbol(activeSymbol);
+  //ui.setInactiveSymbol(inactiveSymbol);
+
+  // You can change this to
+  // TOP, LEFT, BOTTOM, RIGHT
+  ui.setIndicatorPosition(LEFT);
+
+  // Defines where the first frame is located in the bar.
+  ui.setIndicatorDirection(LEFT_RIGHT);
+
+  // You can change the transition that is used
+  // SLIDE_LEFT, SLIDE_RIGHT, SLIDE_UP, SLIDE_DOWN
+  ui.setFrameAnimation(SLIDE_DOWN);
+
+  // Add frames
+  ui.setFrames(frames, frameCount);
+
+  // Add overlays
+  //ui.setOverlays(overlays, overlaysCount);
+
+  // Initialising the UI will init the display too.
+  ui.init();
+
+  display.flipScreenVertically();
+}
 
 /*
    Definición: obtenerPh
@@ -270,9 +359,11 @@ void mqttCallback (char* topic, byte* mensaje, unsigned int longitud) {
       if (char(mensaje[0]) == '1') {
         // Encendemos la luz
         digitalWrite(relePin, HIGH);
+        releEstado = true;
       } else {
         // Apagamos la luz
         digitalWrite(relePin, LOW);
+        releEstado = false;
       }
     }
   }
@@ -406,7 +497,6 @@ void mqttPublicarTemperaturaAgua() {
 #endif
 }
 
-
 /*
    Definición:  mqttPublicarPh
 
@@ -442,14 +532,13 @@ void setup() {
 
   // Limpiamos la pantalla
   display.clear();
-  display.setTextAlignment(TEXT_ALIGN_LEFT);
-  display.setFont(ArialMT_Plain_10);
-  display.drawString(0, 0, "Hello world");
+  drawProgressBar(1);
   display.display();
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   pinMode(relePin, OUTPUT);
+  digitalWrite(relePin, releEstado);
 
   // Comenzamos el sensor DHT
   dht.begin();
@@ -476,11 +565,13 @@ void setup() {
 
   // Apagamos LED
   digitalWrite(LED_BUILTIN, LOW);
+
+  // Configuración OLED
+  uiConfigOled();
 }
 
 void loop() {
-  // Limpiamos pantalla OLED
-  display.clear();
+  ui.update();
 
   // Conexión con MQTT
   if (!mqttCliente.connected()) {
