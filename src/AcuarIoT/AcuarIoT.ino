@@ -546,11 +546,17 @@ void setup() {
   // Instancia a la clase WiFiManager
   WiFiManager wifiManager;
 
+  drawProgressBar(2);
+  display.display();
+
   // Configuramos el punto de acceso. Puedes poner el nombre que quieras
   wifiManager.autoConnect("ACUARIO-WIFI");
 
   // Establecemos tiempo
   tiempoActual = 0;
+
+  drawProgressBar(3);
+  display.display();
 
   // Configuración broker MQTT
   mqttCliente.setServer(mqttServidor, mqttPuerto);
@@ -560,14 +566,20 @@ void setup() {
   mediaTemperatura.clear();
   mediaHumedad.clear();
 
+  drawProgressBar(4);
+  display.display();
+
   // Iniciamos el bus 1-Wire
   ds18b20Sensor.begin();
 
-  // Apagamos LED
-  digitalWrite(LED_BUILTIN, LOW);
+  drawProgressBar(5);
+  display.display();
 
   // Configuración OLED
   uiConfigOled();
+
+  // Apagamos LED
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop() {
