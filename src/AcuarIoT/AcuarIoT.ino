@@ -52,7 +52,7 @@ int tiempoActualizacion = 15000;
    Configuración MQTT
 */
 PubSubClient mqttCliente(clienteEsp);
-const char* mqttServidor = "192.168.1.100";
+const char* mqttServidor = "192.168.0.167";
 const int mqttPuerto = 1883;
 const char mqttTopicLuz[] = "casa/acuario/luz";
 const char mqttTopicTemperaturaExt[] = "casa/servidor/tempext";

@@ -1,12 +1,5 @@
 [
     {
-        "id": "baf97aad.5c06f8",
-        "type": "tab",
-        "label": "AcuarIoT",
-        "disabled": false,
-        "info": ""
-    },
-    {
         "id": "5a8b04ad.b64cdc",
         "type": "mqtt in",
         "z": "baf97aad.5c06f8",
@@ -131,19 +124,6 @@
         "seg2": "",
         "x": 457.71429443359375,
         "y": 481.2857036590576,
-        "wires": []
-    },
-    {
-        "id": "d728bbaa.b1f1d8",
-        "type": "mqtt out",
-        "z": "baf97aad.5c06f8",
-        "name": "Luz",
-        "topic": "casa/acuario/luz",
-        "qos": "1",
-        "retain": "",
-        "broker": "55039030.311ea",
-        "x": 1866.3809776306152,
-        "y": 287.6190347671509,
         "wires": []
     },
     {
@@ -311,8 +291,8 @@
         "z": "baf97aad.5c06f8",
         "name": "Programación luces",
         "info": "",
-        "x": 837.4285583496094,
-        "y": 128.09521865844727,
+        "x": 833.4285583496094,
+        "y": 109.09522819519043,
         "wires": []
     },
     {
@@ -395,98 +375,13 @@
         "func": "// Variable ambito flow\nflow.set('lucesEstado', msg.payload);\n\n// Montamos la query actualizar estado\nvar newMsg = {topic : \"update parametros set VALOR = '\"+ flow.get('lucesEstado') +\"' where NOMBRE = 'lucesEstado'\"};\n\nreturn newMsg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 1808.3809776306152,
-        "y": 360.6190347671509,
+        "x": 1799.3810653686523,
+        "y": 415.6190490722656,
         "wires": [
             [
                 "87aeb5fe.9f6248"
             ]
         ]
-    },
-    {
-        "id": "3a534f47.e596",
-        "type": "function",
-        "z": "baf97aad.5c06f8",
-        "name": "Luces programadas",
-        "func": "// Obtenemos fecha actual\nvar fecha = new Date();\n\n// Estado actual de la luz\nvar estadoLuz = parseInt(flow.get('luzEstado'));\n\n// Comprobamos si existe el estado de la luz\nif (typeof estadoLuz === \"undefined\") {\n\n    // Comprobación estado\n    // Obtenemos el valor de la hora y minutos\n    var horaMinutos = flow.get('encendidoLuz').toString().split(\":\");\n    var hora = parseInt(horaMinutos[0]);\n    var minutos = parseInt(horaMinutos[1]);\n\n    // Comprobamos si encendemos\n    if(hora >= fecha.getHours() && minutos >= fecha.getMinutes()){\n        // Cambiamos estado\n        flow.set('luzEstado', 1);\n        // Activamos encendido de luces\n        msg.payload = 1;\n    }else{\n        // Cambiamos estado\n        flow.set('luzEstado', 0);\n        // Activamos encendido de luces\n        msg.payload = 0;\n    }\n    return msg;\n}\n\n// Establecemos no actualización\nmsg.payload = -1;\n\n// Comprobamos si está encendido o apagado\nif(estadoLuz === 0){\n\n    // Obtenemos el valor de la hora y minutos\n    var horaMinutos = flow.get('encendidoLuz').toString().split(\":\");\n    var hora = parseInt(horaMinutos[0]);\n    var minutos = parseInt(horaMinutos[1]);\n\n    // Comprobamos si encendemos\n    if(hora >= fecha.getHours() && minutos >= fecha.getMinutes()){\n        node.warn(\"Apagado/Encendido\");\n        // Cambiamos estado\n        flow.set('luzEstado', 1);\n        // Activamos encendido de luces\n        msg.payload = 1;\n    }\n}else{\n\n    // Obtenemos el valor de la hora y minutos\n    var horaMinutos = flow.get('apagadoLuz').toString().split(\":\");\n    var hora = parseInt(horaMinutos[0]);\n    var minutos = parseInt(horaMinutos[1]);\n\n    // Comprobamos si encendemos\n    if(hora <= fecha.getHours() && minutos < fecha.getMinutes()){\n        node.warn(\"Encendido/Apagado\");\n        // Cambiamos estado\n        flow.set('luzEstado', 0);\n        // Activamos encendido de luces\n        msg.payload = 0;\n    }\n}\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 1265.0475845336914,
-        "y": 556.2856292724609,
-        "wires": [
-            [
-                "dde8c81e.55a118"
-            ]
-        ]
-    },
-    {
-        "id": "dde8c81e.55a118",
-        "type": "switch",
-        "z": "baf97aad.5c06f8",
-        "name": "Switch encendido",
-        "property": "payload",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "eq",
-                "v": "-1",
-                "vt": "num"
-            },
-            {
-                "t": "else"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 1494.0475845336914,
-        "y": 559.2856292724609,
-        "wires": [
-            [
-                "90affa11.85bdc8"
-            ],
-            [
-                "885ddbbf.f86c68",
-                "9835c925.adf268"
-            ]
-        ]
-    },
-    {
-        "id": "885ddbbf.f86c68",
-        "type": "mqtt out",
-        "z": "baf97aad.5c06f8",
-        "name": "Luz",
-        "topic": "casa/acuario/luz",
-        "qos": "2",
-        "retain": "",
-        "broker": "55039030.311ea",
-        "x": 1714.0475845336914,
-        "y": 594.2856292724609,
-        "wires": []
-    },
-    {
-        "id": "90affa11.85bdc8",
-        "type": "debug",
-        "z": "baf97aad.5c06f8",
-        "name": "",
-        "active": false,
-        "console": "false",
-        "complete": "payload",
-        "x": 1715.0475845336914,
-        "y": 487.28562927246094,
-        "wires": []
-    },
-    {
-        "id": "9835c925.adf268",
-        "type": "debug",
-        "z": "baf97aad.5c06f8",
-        "name": "",
-        "active": false,
-        "console": "false",
-        "complete": "payload",
-        "x": 1749.0475845336914,
-        "y": 697.2856292724609,
-        "wires": []
     },
     {
         "id": "76aa136b.e6055c",
@@ -542,6 +437,134 @@
         "name": "CREATE parametros",
         "x": 556.2500076293945,
         "y": 1003.7500305175781,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "78533dbc.d31814",
+        "type": "inject",
+        "z": "baf97aad.5c06f8",
+        "name": "CREATE tempext",
+        "topic": "CREATE TABLE tempext(TIMESTAMP INT PRIMARY KEY NOT NULL, VALOR FLOAT NOT NULL)",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 272.5,
+        "y": 1055,
+        "wires": [
+            [
+                "67589735.d49a88"
+            ]
+        ]
+    },
+    {
+        "id": "67589735.d49a88",
+        "type": "sqlite",
+        "z": "baf97aad.5c06f8",
+        "mydb": "f1c2e5ee.000048",
+        "name": "CREATE tempext",
+        "x": 542.5000076293945,
+        "y": 1055.000015258789,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5a2b6f5b.fd85",
+        "type": "inject",
+        "z": "baf97aad.5c06f8",
+        "name": "CREATE humext",
+        "topic": "CREATE TABLE humext(TIMESTAMP INT PRIMARY KEY NOT NULL, VALOR FLOAT NOT NULL)",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 271.25,
+        "y": 1110,
+        "wires": [
+            [
+                "c5d229b7.fb07f8"
+            ]
+        ]
+    },
+    {
+        "id": "c5d229b7.fb07f8",
+        "type": "sqlite",
+        "z": "baf97aad.5c06f8",
+        "mydb": "f1c2e5ee.000048",
+        "name": "CREATE humext",
+        "x": 541.2500076293945,
+        "y": 1110.000015258789,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6280d3ef.b8d0bc",
+        "type": "inject",
+        "z": "baf97aad.5c06f8",
+        "name": "CREATE tempagua",
+        "topic": "CREATE TABLE tempagua(TIMESTAMP INT PRIMARY KEY NOT NULL, VALOR FLOAT NOT NULL)",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 281.25,
+        "y": 1167.5,
+        "wires": [
+            [
+                "b887da26.0463b8"
+            ]
+        ]
+    },
+    {
+        "id": "b887da26.0463b8",
+        "type": "sqlite",
+        "z": "baf97aad.5c06f8",
+        "mydb": "f1c2e5ee.000048",
+        "name": "CREATE tempagua",
+        "x": 541.2500076293945,
+        "y": 1167.500015258789,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "542e5ff2.7b815",
+        "type": "inject",
+        "z": "baf97aad.5c06f8",
+        "name": "CREATE ph",
+        "topic": "CREATE TABLE ph(TIMESTAMP INT PRIMARY KEY NOT NULL, VALOR FLOAT NOT NULL)",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 260,
+        "y": 1225,
+        "wires": [
+            [
+                "237c0928.390686"
+            ]
+        ]
+    },
+    {
+        "id": "237c0928.390686",
+        "type": "sqlite",
+        "z": "baf97aad.5c06f8",
+        "mydb": "f1c2e5ee.000048",
+        "name": "CREATE ph",
+        "x": 520.0000076293945,
+        "y": 1225.000015258789,
         "wires": [
             []
         ]
@@ -867,8 +890,8 @@
         "z": "baf97aad.5c06f8",
         "mydb": "f1c2e5ee.000048",
         "name": "Update estadoLuces",
-        "x": 2034.666690826416,
-        "y": 360.333327293396,
+        "x": 2025.6667785644531,
+        "y": 415.33334159851074,
         "wires": [
             []
         ]
@@ -900,7 +923,8 @@
         "wires": [
             [
                 "335d1c40.ad3b74",
-                "d728bbaa.b1f1d8"
+                "6b31a925.ff1268",
+                "a9b123f8.827b3"
             ]
         ]
     },
@@ -943,9 +967,164 @@
         "qos": "2",
         "retain": "",
         "broker": "55039030.311ea",
-        "x": 1543.75,
-        "y": 427.5,
+        "x": 1770.750431060791,
+        "y": 339.4999885559082,
         "wires": []
+    },
+    {
+        "id": "dcef8649.b30618",
+        "type": "mqtt in",
+        "z": "baf97aad.5c06f8",
+        "name": "Luz APP",
+        "topic": "casa/servidor/luz",
+        "qos": "2",
+        "broker": "55039030.311ea",
+        "x": 1021,
+        "y": 287,
+        "wires": [
+            [
+                "4159944e.8821fc"
+            ]
+        ]
+    },
+    {
+        "id": "e50ae1d1.40c3a",
+        "type": "change",
+        "z": "baf97aad.5c06f8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "origen",
+                "pt": "msg",
+                "to": "app",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1344,
+        "y": 263,
+        "wires": [
+            [
+                "d8a1465f.714cf8"
+            ]
+        ]
+    },
+    {
+        "id": "4159944e.8821fc",
+        "type": "switch",
+        "z": "baf97aad.5c06f8",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1160,
+        "y": 286,
+        "wires": [
+            [
+                "e50ae1d1.40c3a"
+            ],
+            [
+                "7f4009f.8f463f8"
+            ]
+        ]
+    },
+    {
+        "id": "7f4009f.8f463f8",
+        "type": "change",
+        "z": "baf97aad.5c06f8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "1",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "origen",
+                "pt": "msg",
+                "to": "app",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1346,
+        "y": 318,
+        "wires": [
+            [
+                "d8a1465f.714cf8"
+            ]
+        ]
+    },
+    {
+        "id": "58888b68.ba5144",
+        "type": "mqtt out",
+        "z": "baf97aad.5c06f8",
+        "name": "Luz",
+        "topic": "casa/servidor/luz",
+        "qos": "2",
+        "retain": "",
+        "broker": "55039030.311ea",
+        "x": 1867.3509101867676,
+        "y": 287.01037406921387,
+        "wires": []
+    },
+    {
+        "id": "a9b123f8.827b3",
+        "type": "switch",
+        "z": "baf97aad.5c06f8",
+        "name": "",
+        "property": "origen",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "app",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1716.3507614135742,
+        "y": 288.0104179382324,
+        "wires": [
+            [
+                "58888b68.ba5144"
+            ]
+        ]
     },
     {
         "id": "55039030.311ea",
