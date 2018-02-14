@@ -20,11 +20,23 @@
 #include "SSD1306.h"
 #include "OLEDDisplayUi.h"
 
+// Neopixel
+#include <Adafruit_NeoPixel.h>
+
 /*
    Debug
 */
 // Descomentar para ver mensajes por el monitor serie
 #define ACUARIO_DEBUG
+
+/*
+   NeoPixel
+*/
+#define PINPIXELS D7
+#define NUMPIXELS 9
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PINPIXELS, NEO_GRB + NEO_KHZ800);
+int pixelsDelay = 500;
+int colorNeopixel[] = {0,0,0};
 
 /*
    Configuración DHT11
@@ -55,6 +67,7 @@ PubSubClient mqttCliente(clienteEsp);
 const char* mqttServidor = "192.168.0.167";
 const int mqttPuerto = 1883;
 const char mqttTopicLuz[] = "casa/acuario/luz";
+const char mqttTopicColor[] = "casa/acuario/color";
 const char mqttTopicTemperaturaExt[] = "casa/servidor/tempext";
 const char mqttTopicHumedadExt[] = "casa/servidor/humext";
 const char mqttTopicIndiceExt[] = "casa/servidor/indiceext";
@@ -81,7 +94,7 @@ DallasTemperature ds18b20Sensor(&ds18b20OneWireObjeto);
 /*
    Relé
 */
-const byte relePin = D7;
+const byte relePin = D8;
 boolean releEstado = false;
 
 /*
@@ -96,6 +109,28 @@ OLEDDisplayUi ui     ( &display );
 const byte phPin = A0;
 float phOffset = 0.00;
 RunningAverage mediaPh(40);
+
+/*
+   Definición: amanecerAnochecerNeopiXel
+
+   Propósito: amanece o anochece NeoPixel
+
+   Parámetros: boolean isAmanecer true si hay que amanecer
+
+   Return: void
+*/
+void amanecerAnochecerNeopixel(boolean isAmanecer) {
+  for (int i = 0; i < NUMPIXELS; i++) {
+    if (isAmanecer) {
+      pixels.setPixelColor(i, pixels.Color(colorNeopixel[0], colorNeopixel[1], colorNeopixel[2]));
+      pixels.show();
+    } else {
+      pixels.setPixelColor(i, pixels.Color(0, 0, 0));
+      pixels.show();
+    }
+  }
+}
+
 /*
   Pantallas a dibujar
 */
@@ -132,7 +167,7 @@ void drawFrame4(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int1
   display->drawString(71 + x, 15 + y, "LUZ");
 
   display->setFont(ArialMT_Plain_24);
-  display->drawString(70 + x, 34 + y, (releEstado?"ON":"OFF"));
+  display->drawString(70 + x, 34 + y, (releEstado ? "ON" : "OFF"));
 }
 
 void drawProgressBar(int fase) {
@@ -150,7 +185,7 @@ FrameCallback frames[] = { drawFrame1, drawFrame2, drawFrame3, drawFrame4};
 int frameCount = 4;
 
 // Configuración de UI Oled
-void uiConfigOled(){
+void uiConfigOled() {
   // The ESP is capable of rendering 60fps in 80Mhz mode
   // but that won't give you much time for anything else
   // run it in 160Mhz mode or just set it to 30 fps
@@ -192,7 +227,7 @@ void uiConfigOled(){
 
    Return:     float: valor de pH
 */
-float obtenerPh(){
+float obtenerPh() {
   // Lectura pin analógico
   int valorPinAnalogicoPh = analogRead(phPin);
 
@@ -200,11 +235,11 @@ float obtenerPh(){
   mediaPh.addValue(valorPinAnalogicoPh);
 
   // Cálculo del voltaje
-  float voltajePh = mediaPh.getAverage()*5.0/1024;
+  float voltajePh = mediaPh.getAverage() * 5.0 / 1024;
 
 #ifdef ACUARIO_DEBUG
-  Serial.print("[PH] pH: ");
-  Serial.println((voltajePh * 3.5) + phOffset);
+  //Serial.print("[PH] pH: ");
+  //Serial.println((voltajePh * 3.5) + phOffset);
 #endif
 
   return (voltajePh * 3.5) + phOffset;
@@ -358,14 +393,33 @@ void mqttCallback (char* topic, byte* mensaje, unsigned int longitud) {
     if (longitud == 1) {
       if (char(mensaje[0]) == '1') {
         // Encendemos la luz
-        digitalWrite(relePin, HIGH);
+        //digitalWrite(relePin, HIGH);
+        amanecerAnochecerNeopixel(true);
         releEstado = true;
       } else {
         // Apagamos la luz
-        digitalWrite(relePin, LOW);
+        //digitalWrite(relePin, LOW);
+        amanecerAnochecerNeopixel(false);
         releEstado = false;
       }
     }
+  }else if (String(topic) == mqttTopicColor) {
+    String colores[3];
+    byte contador = 0;
+    for (int i = 0; i < longitud; i++) {
+      if((char)mensaje[i] == '&'){
+        contador++;
+      }else
+      {
+        colores[contador] += (char)mensaje[i];
+      }
+    }
+
+    colorNeopixel[0] = colores[0].toInt();
+    colorNeopixel[1] = colores[1].toInt();
+    colorNeopixel[2] = colores[2].toInt();
+
+    amanecerAnochecerNeopixel(releEstado);
   }
 
 }
@@ -391,6 +445,7 @@ void mqttReconectar() {
       Serial.println("[MQTT] Conectado al broker MQTT");
       // Subscripción al topic de acciones
       mqttCliente.subscribe(mqttTopicLuz);
+      mqttCliente.subscribe(mqttTopicColor);
 #endif
     } else {
 #ifdef ACUARIO_DEBUG
@@ -506,7 +561,7 @@ void mqttPublicarTemperaturaAgua() {
 
    Return:     void No devuelve nada
 */
-void mqttPublicarPh(){
+void mqttPublicarPh() {
   char msg[32];
   snprintf(msg, 32, "%2.1f", obtenerPh());
   // Envío del mensaje al topic
@@ -537,8 +592,9 @@ void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
-  pinMode(relePin, OUTPUT);
-  digitalWrite(relePin, releEstado);
+  //pinMode(relePin, OUTPUT);
+  //digitalWrite(relePin, releEstado);
+  amanecerAnochecerNeopixel(releEstado);
 
   // Comenzamos el sensor DHT
   dht.begin();
@@ -576,10 +632,14 @@ void setup() {
   display.display();
 
   // Configuración OLED
+  display.clear();
   uiConfigOled();
 
   // Apagamos LED
   digitalWrite(LED_BUILTIN, LOW);
+
+  // Iniciamos tira de NeoPixel
+  pixels.begin();
 }
 
 void loop() {
@@ -626,11 +686,12 @@ void loop() {
       mqttPublicarHumedadExt();
       // Indice Calor
       mqttPublicarIndiceExt(indiceCalorDHT11);
+    }
+
       // Publicar temperatura agua
       mqttPublicarTemperaturaAgua();
       // Publicar pH
       mqttPublicarPh();
-    }
   }
 }
 
